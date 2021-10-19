@@ -97,13 +97,13 @@ function init()
         //switch( event.srcElement.index ) {
         switch( event.target.index ) {
           case 0:
-            colorChange();
+            colorChange(000000);
             break;
          case 1:
-            delay /= 2.0;
+            colorChange(ff0000);
             break;
          case 2:
-            delay *= 2.0;
+            colorChange(green.value);
             break;
        }
     };
