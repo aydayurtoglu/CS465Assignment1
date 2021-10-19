@@ -34,7 +34,11 @@
   <body>
     <h1>Painting with the Mouse</h1>
     <div id="menu">
-        Line color<input id="colorInput" class="color" value="FF0000"
+        Line width<input id="lineWidthSlider" type="range" min="1.0" max="10.0"
+                              value="1.0" step="0.1"
+                              oninput="changeLineWidth(this.value)"/>
+        <span id="range">1.00</span><br>
+        Line color<input id="colorInput" class="color" value="000000"
                          onchange="colorChange(this)"><br>
     </div>
     <canvas id="gl-canvas" width="512" height="512">

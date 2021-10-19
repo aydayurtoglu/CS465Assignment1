@@ -8,7 +8,7 @@ var colors = [];
 
 var lineWidth = 1.0;
 var mouseClicked = false;
-var lineColor = [1, 0, 0];
+var lineColor = [0, 0, 0];
 
 var bufferId;
 var cbufferId;
