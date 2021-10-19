@@ -40,10 +40,24 @@
         <span id="range">1.00</span><br>
         Line color<input id="colorInput" class="color" value="000000"
                          onchange="colorChange(this)"><br>
+        <button id="UndoButton">Undo</button>
+        <button id="RedoButton">Redo</button>
+        
     </div>
-    <canvas id="gl-canvas" width="512" height="512">
+      <canvas id="gl-canvas" width="512" height="512">
         Oops... your browser doesn't support the HTML5 canvas element
     </canvas>
+    <select id="Colors" size="8">
+      <option value="0">Black</option>
+      <option value="1">Red</option>
+      <option value="3">Green</option>
+      <option value="4">Blue</option>
+      <option value="5">Magenta</option>
+      <option value="6">Cyan</option>
+      <option value="7">Yellow</option>
+      <option value="8">White</option>
+    </select>
+    
     <div style="text-align:center;">
         Canvas color<input id="canvasColorInput" class="color" value="FFFFFF"
                      onchange="canvasColorChange(this)"><br>

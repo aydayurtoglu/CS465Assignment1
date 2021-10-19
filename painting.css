@@ -1,8 +1,6 @@
 body {
     background-color: #A9A9A9;
     margin: 1% 20%;
-    border: 1px dotted black;
-    border-radius: 15px;
     padding: 10px;
     font-family: sans-serif;
 }
@@ -10,6 +8,7 @@ body {
 canvas {
     display: block;
     margin: 20px auto;
+    float: right;
 }
 
 h1 {
@@ -21,6 +20,7 @@ h1 {
 input[type="range"] {
     width: 275px;
 }
+
 
 #lineWidthSlider {
     margin: 0px 0px 10px 20px;
@@ -37,4 +37,5 @@ input[type="range"] {
 #menu {
     padding: 5px;
     text-align: center;
+    float: left;
 }

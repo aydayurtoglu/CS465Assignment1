@@ -93,6 +93,21 @@ function init()
         currPts = [];
     });
 
+    document.getElementById("Colors" ).onclick = function(event) {
+        //switch( event.srcElement.index ) {
+        switch( event.target.index ) {
+          case 0:
+            colorChange();
+            break;
+         case 1:
+            delay /= 2.0;
+            break;
+         case 2:
+            delay *= 2.0;
+            break;
+       }
+    };
+
     currPts = [];
     render();
 };
