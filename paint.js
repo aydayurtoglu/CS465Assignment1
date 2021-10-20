@@ -125,6 +125,10 @@ function init()
 
 function createLine(begin, end)
 {
+    // We should draw circles using triangles:
+    // https://stackoverflow.com/questions/32780958/drawing-a-circle-with-triangles-webgl
+
+
     // get initial and final pts on a line, return rectangle with width
     var width = lineWidth * 0.001;
     var beta = (Math.PI/2.0) - Math.atan2(end[1] - begin[1], end[0] - begin[0]);
