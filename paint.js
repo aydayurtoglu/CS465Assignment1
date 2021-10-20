@@ -108,6 +108,21 @@ function init()
        }
     };
 
+    document.getElementById("UndoButton" ).onclick = function(event) {
+        //switch( event.srcElement.index ) {
+        switch( event.target.index ) {
+          case 0:
+            colorChange(000000);
+            break;
+         case 1:
+            colorChange(ff0000);
+            break;
+         case 2:
+            colorChange(green.value);
+            break;
+       }
+    };
+
     currPts = [];
     render();
 };
