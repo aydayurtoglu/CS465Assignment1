@@ -5,6 +5,19 @@ var gl;
 var currPts = [];
 var points = [];
 var colors = [];
+var cindex = 0;
+
+var predefinedColors = [
+
+  vec4(0.0, 0.0, 0.0, 1.0), // black
+  vec4(1.0, 0.0, 0.0, 1.0), // red
+  vec4(1.0, 1.0, 0.0, 1.0), // yellow
+  vec4(0.0, 1.0, 0.0, 1.0), // green
+  vec4(0.0, 0.0, 1.0, 1.0), // blue
+  vec4(1.0, 0.0, 1.0, 1.0), // magenta
+  vec4(0.0, 1.0, 1.0, 1.0),// cyan
+  vec4(0.0, 0.0, 0.0, 0.0) // white
+];
 
 var lineWidth = 1.0;
 var mouseClicked = false;
@@ -84,6 +97,8 @@ function init()
         }
     });
 
+    
+
     canvas.addEventListener("mousedown", function() {
         mouseClicked = true;
     });
@@ -93,34 +108,15 @@ function init()
         currPts = [];
     });
 
-    document.getElementById("Colors" ).onclick = function(event) {
-        //switch( event.srcElement.index ) {
-        switch( event.target.index ) {
-          case 0:
-            colorChange(000000);
-            break;
-         case 1:
-            colorChange(ff0000);
-            break;
-         case 2:
-            colorChange(green.value);
-            break;
-       }
-    };
+    var colorsMenu = document.getElementById("Colors");
+
+    colorsMenu.addEventListener("click", function() {
+        cindex = colorsMenu.selectedIndex;
+    });
 
     document.getElementById("UndoButton" ).onclick = function(event) {
-        //switch( event.srcElement.index ) {
-        switch( event.target.index ) {
-          case 0:
-            colorChange(000000);
-            break;
-         case 1:
-            colorChange(ff0000);
-            break;
-         case 2:
-            colorChange(green.value);
-            break;
-       }
+        // undo
+
     };
 
     currPts = [];
