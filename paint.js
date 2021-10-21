@@ -1,13 +1,16 @@
+"use strict";
 
 var canvas;
 var gl;
 
-var currPts = [];
-var points = [];
-var colors = [];
+var maxNumVertices = 20000;
+var index = 0;
+
+var delay = 50;
+
 var cindex = 0;
 
-var predefinedColors = [
+var colors = [
 
   vec4(0.0, 0.0, 0.0, 1.0), // black
   vec4(1.0, 0.0, 0.0, 1.0), // red
@@ -15,149 +18,105 @@ var predefinedColors = [
   vec4(0.0, 1.0, 0.0, 1.0), // green
   vec4(0.0, 0.0, 1.0, 1.0), // blue
   vec4(1.0, 0.0, 1.0, 1.0), // magenta
-  vec4(0.0, 1.0, 1.0, 1.0),// cyan
-  vec4(0.0, 0.0, 0.0, 0.0) // white
+  vec4(0.0, 1.0, 1.0, 1.0) // cyan
 ];
+var t;
+var numPolygons = 0;
+var numIndices = [];
+numIndices[0] = 0;
+var start = [0];
 
-var lineWidth = 1.0;
 var mouseClicked = false;
-var lineColor = [0, 0, 0];
 
-var bufferId;
-var cbufferId;
-var maxNumberOfPoints = 200000;
+window.onload = function init() {
+  canvas = document.getElementById("gl-canvas");
 
-function changeLineWidth(newValue)
-{
-    var numVal = Number(newValue);
-    document.getElementById("range").innerHTML = numVal.toPrecision(3);
-    lineWidth = numVal;
-    render();
-}
+  gl = WebGLUtils.setupWebGL(canvas);
+  if (!gl) {
+    alert("WebGL isn't available");
+  }
 
-function clearFunction()
-{
-    points = [];
-    currPts = [];
-    colors = [];
-    render();
-}
+  var m = document.getElementById("mymenu");
 
-function colorChange(newValue)
-{
-    lineColor = newValue.color.rgb;
-}
+  m.addEventListener("click", function() {
+    cindex = m.selectedIndex;
+  });
 
-function canvasColorChange(newValue)
-{
-    var newRgb = newValue.color.rgb;
-    gl.clearColor(newRgb[0], newRgb[1], newRgb[2], 1.0);
-    render();
-}
+  var c = document.getElementById("clearButton")
+  c.addEventListener("click", function(){
+    index = 0;
+    numPolygons = 0;
+    numIndices = [];
+    numIndices[0] = 0;
+    start = [0];
+  });
+  
+  canvas.addEventListener("mousedown", function(event){
+    mouseClicked = true;
+    numPolygons++;
+    numIndices[numPolygons] = 0;
+    start[numPolygons] = index;
+  });
+  
+  canvas.addEventListener("mouseup", function(event){
+    mouseClicked = false;
+  });
+  
+  canvas.addEventListener("mousemove", function(event) {
+    if(mouseClicked){
+      t = vec2(2 * event.clientX / canvas.width - 1,
+        2 * (canvas.height - event.clientY) / canvas.height - 1);
+      gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
+      gl.bufferSubData(gl.ARRAY_BUFFER, 8 * index, flatten(t));
 
-function init()
-{
-    canvas = document.getElementById("gl-canvas");
+      t = vec4(colors[cindex]);
 
-    gl = WebGLUtils.setupWebGL(canvas);
-    if (!gl) {
-        alert("WebGL isn't available");
+      gl.bindBuffer(gl.ARRAY_BUFFER, cBufferId);
+      gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(t));
+
+      numIndices[numPolygons]++;
+      index++;
     }
+  });
 
-    //  Configure WebGL
-    gl.viewport(0, 0, canvas.width, canvas.height);
-    gl.clearColor(1.0, 1.0, 1.0, 1.0);
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  gl.clearColor(0.8, 0.8, 0.8, 1.0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
 
-    //  Load shaders and initialize attribute buffers
-    var program = initShaders(gl, "vertex-shader", "fragment-shader");
-    gl.useProgram(program);
+  //
+  //  Load shaders and initialize attribute buffers
+  //
+  var program = initShaders(gl, "vertex-shader", "fragment-shader");
+  gl.useProgram(program);
 
-    // Vertex buffer
-    bufferId = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
-    gl.bufferData(gl.ARRAY_BUFFER, 8 * maxNumberOfPoints, gl.STATIC_DRAW);
-    var vPosition = gl.getAttribLocation(program, "vPosition");
-    gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(vPosition);
+  var bufferId = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
+  gl.bufferData(gl.ARRAY_BUFFER, 8 * maxNumVertices, gl.STATIC_DRAW);
+  var vPos = gl.getAttribLocation(program, "vPosition");
+  gl.vertexAttribPointer(vPos, 2, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(vPos);
 
-    // Color buffer
-    cbufferId = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, cbufferId);
-    gl.bufferData(gl.ARRAY_BUFFER, 8 * maxNumberOfPoints, gl.STATIC_DRAW);
-    var vColor = gl.getAttribLocation(program, "vColor");
-    gl.vertexAttribPointer(vColor, 3, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(vColor);
+  var cBufferId = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, cBufferId);
+  gl.bufferData(gl.ARRAY_BUFFER, 16 * maxNumVertices, gl.STATIC_DRAW);
+  var vColor = gl.getAttribLocation(program, "vColor");
+  gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(vColor);
 
-    // Event listeners for mouse input
-    canvas.addEventListener("mousemove", function(event) {
-        if (mouseClicked == true) {
-            currPts.push(vec2(-1 + 2*event.offsetX/canvas.width,
-                              -1 + 2*(canvas.height - event.offsetY)/canvas.height));
-            render();
-        }
-    });
-
-    
-
-    canvas.addEventListener("mousedown", function() {
-        mouseClicked = true;
-    });
-
-    canvas.addEventListener("mouseup", function() {
-        mouseClicked = false;
-        currPts = [];
-    });
-
-    var colorsMenu = document.getElementById("Colors");
-
-    colorsMenu.addEventListener("click", function() {
-        cindex = colorsMenu.selectedIndex;
-    });
-
-    document.getElementById("UndoButton" ).onclick = function(event) {
-        // undo
-
-    };
-
-    currPts = [];
-    render();
-};
-
-function createLine(begin, end)
-{
-    // We should draw circles using triangles:
-    // https://stackoverflow.com/questions/32780958/drawing-a-circle-with-triangles-webgl
-
-
-    // get initial and final pts on a line, return rectangle with width
-    var width = lineWidth * 0.001;
-    var beta = (Math.PI/2.0) - Math.atan2(end[1] - begin[1], end[0] - begin[0]);
-    var delta_x = Math.cos(beta)*width;
-    var delta_y = Math.sin(beta)*width;
-    return [vec2(begin[0] - delta_x, begin[1] + delta_y),
-            vec2(begin[0] + delta_x, begin[1] - delta_y),
-            vec2(end[0] + delta_x, end[1] - delta_y),
-            vec2(end[0] - delta_x, end[1] + delta_y)];
+  render();
 }
 
-window.onload = init;
+function render() {
 
-function render()
-{
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    if (currPts.length == 2) {
-        var tempPts = createLine(currPts[0], currPts[1]);
-        points.push(tempPts[0], tempPts[1], tempPts[2], tempPts[3]);
-        for (var i = 0; i < 4; ++i) {
-            colors.push(lineColor[0], lineColor[1], lineColor[2]);
-        }
-        currPts.shift();
-    }
-    gl.bindBuffer(gl.ARRAY_BUFFER, cbufferId);
-    gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(colors));
-    gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
-    gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(points));
-    for (var i = 0; i < points.length / 4; i++) {
-        gl.drawArrays(gl.TRIANGLE_FAN, 4 * i, 4);
-    }
+  gl.clear(gl.COLOR_BUFFER_BIT);
+
+  for (var i = 0; i <= numPolygons; i++) {
+    gl.drawArrays(gl.LINE_STRIP, start[i], numIndices[i]);
+  }
+
+  setTimeout(
+    function() {
+      requestAnimFrame(render);
+    }, delay
+  );
 }
