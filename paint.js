@@ -27,7 +27,6 @@ var numPolygons = 0;
 var numIndices = [];
 numIndices[0] = 0;
 var start = [0];
-var undoOperations = []
 
 var mouseClicked = false;
 
@@ -51,33 +50,14 @@ window.onload = function init() {
     numPolygons = 0;
     numIndices = [];
     numIndices[0] = 0;
-  });
-
-  var undo = document.getElementById("undoButton");
-  undo.addEventListener("click", function(){
-
-
-    index = 0;
-    numPolygons = 0;
-    numIndices = [];
-    numIndices[0] = 0;
     start = [0];
   });
-
-
-  var redo = document.getElementById("redoButton");
-  redo.addEventListener("click", function(){
-    index = 0;
-    numPolygons = 0;
-    numIndices = [];
-    numIndices[0] = 0;
-    start = [0];
-  });
-
+  
   canvas.addEventListener("mousedown", function(event){
     mouseClicked = true;
     numPolygons++;
     numIndices[numPolygons] = 0;
+    start[numPolygons] = index;
   });
   
   canvas.addEventListener("mouseup", function(event){
@@ -155,7 +135,7 @@ function render() {
   gl.clear(gl.COLOR_BUFFER_BIT);
 
   for (var i = 0; i <= numPolygons; i++) {
-    gl.drawArrays(gl.LINE_STRIP, 0, numIndices[i]);
+    gl.drawArrays(gl.LINE_STRIP, start[i], numIndices[i]);
   }
 
   setTimeout(
