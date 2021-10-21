@@ -25,6 +25,7 @@ var numPolygons = 0;
 var numIndices = [];
 numIndices[0] = 0;
 var start = [0];
+var undoOperations = []
 
 var mouseClicked = false;
 
@@ -50,7 +51,28 @@ window.onload = function init() {
     numIndices[0] = 0;
     start = [0];
   });
-  
+
+  var undo = document.getElementById("undoButton");
+  undo.addEventListener("click", function(){
+
+
+    index = 0;
+    numPolygons = 0;
+    numIndices = [];
+    numIndices[0] = 0;
+    start = [0];
+  });
+
+
+  var redo = document.getElementById("redoButton");
+  redo.addEventListener("click", function(){
+    index = 0;
+    numPolygons = 0;
+    numIndices = [];
+    numIndices[0] = 0;
+    start = [0];
+  });
+
   canvas.addEventListener("mousedown", function(event){
     mouseClicked = true;
     numPolygons++;
