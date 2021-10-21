@@ -9,6 +9,8 @@ var index = 0;
 var delay = 50;
 
 var cindex = 0;
+var strokeIndex = 0;
+var points =  [];
 
 var colors = [
 
@@ -24,7 +26,6 @@ var t;
 var numPolygons = 0;
 var numIndices = [];
 numIndices[0] = 0;
-var start = [0];
 
 var mouseClicked = false;
 
@@ -48,14 +49,12 @@ window.onload = function init() {
     numPolygons = 0;
     numIndices = [];
     numIndices[0] = 0;
-    start = [0];
   });
   
   canvas.addEventListener("mousedown", function(event){
     mouseClicked = true;
     numPolygons++;
     numIndices[numPolygons] = 0;
-    start[numPolygons] = index;
   });
   
   canvas.addEventListener("mouseup", function(event){
@@ -66,18 +65,40 @@ window.onload = function init() {
     if(mouseClicked){
       t = vec2(2 * event.clientX / canvas.width - 1,
         2 * (canvas.height - event.clientY) / canvas.height - 1);
-      gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
-      gl.bufferSubData(gl.ARRAY_BUFFER, 8 * index, flatten(t));
+        gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
+        gl.bufferSubData(gl.ARRAY_BUFFER, 8 * index, flatten(t));
 
-      t = vec4(colors[cindex]);
+        t = vec4(colors[cindex]);
 
-      gl.bindBuffer(gl.ARRAY_BUFFER, cBufferId);
-      gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(t));
+        gl.bindBuffer(gl.ARRAY_BUFFER, cBufferId);
+        gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(t));
 
-      numIndices[numPolygons]++;
-      index++;
+        numIndices[numPolygons]++;
+        index++;
+
+        var center = vec2(event.clientX, event.clientY); 
+   
+        points.push(center);
+        for (i = 0; i <= 100; i++){
+            points.push(center + vec2(
+                r*Math.cos(i * 2 * Math.PI / 200),
+                r*Math.sin(i * 2 * Math.PI / 200) 
+            ));
+        }
     }
   });
+
+  /*
+  var center = vec2(event.clientX, event.clientY); 
+   
+    points.push(center);
+    for (i = 0; i <= 100; i++){
+        points.push(center + vec2(
+            r*Math.cos(i * 2 * Math.PI / 200),
+            r*Math.sin(i * 2 * Math.PI / 200) 
+        ));
+    }
+    */
 
   gl.viewport(0, 0, canvas.width, canvas.height);
   gl.clearColor(0.8, 0.8, 0.8, 1.0);
@@ -111,7 +132,7 @@ function render() {
   gl.clear(gl.COLOR_BUFFER_BIT);
 
   for (var i = 0; i <= numPolygons; i++) {
-    gl.drawArrays(gl.LINE_STRIP, start[i], numIndices[i]);
+    gl.drawArrays(gl.LINE_STRIP, 0, numIndices[i]);
   }
 
   setTimeout(
