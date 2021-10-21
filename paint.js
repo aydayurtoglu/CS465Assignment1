@@ -27,6 +27,8 @@ var numPolygons = 0;
 var numIndices = [];
 numIndices[0] = 0;
 var start = [0];
+var undoOperations=[10];
+var undoNo = 0;
 
 var mouseClicked = false;
 
@@ -44,13 +46,39 @@ window.onload = function init() {
     cindex = m.selectedIndex;
   });
 
-  var c = document.getElementById("clearButton")
-  c.addEventListener("click", function(){
-    index = 0;
-    numPolygons = 0;
-    numIndices = [];
-    numIndices[0] = 0;
-    start = [0];
+    var c = document.getElementById("clearButton")
+    c.addEventListener("click", function(){
+        index = 0;
+        numPolygons = 0;
+        numIndices = [];
+        numIndices[0] = 0;
+        start = [0];
+    });
+
+    var undo = document.getElementById("undoButton")
+    undo.addEventListener("click", function(){
+        
+        if (undoNo == 9)
+            return;
+
+        undoOperations[undoNo] = numIndices[numPolygons];
+        numIndices[numPolygons] = 0;
+        numPolygons = numPolygons - 1;
+        undoNo++;
+
+  });
+
+  var redo = document.getElementById("clearButton")
+  redo.addEventListener("click", function(){
+
+    if (undoNo == 0)
+            return;
+
+        numPolygons++;
+        numIndices[numPolygons] = undoOperations[undoNo];
+        undoOperations[undoNo] = 0;
+        undoNo--;
+        
   });
   
   canvas.addEventListener("mousedown", function(event){
@@ -66,7 +94,8 @@ window.onload = function init() {
   
   canvas.addEventListener("mousemove", function(event) {
     if(mouseClicked){
-      t = vec2(2 * event.clientX / canvas.width - 1,
+        var r = 2000;
+        t = vec2(2 * event.clientX / canvas.width - 1,
         2 * (canvas.height - event.clientY) / canvas.height - 1);
         gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
         gl.bufferSubData(gl.ARRAY_BUFFER, 8 * index, flatten(t));
@@ -82,7 +111,7 @@ window.onload = function init() {
         var center = vec2(event.clientX, event.clientY); 
    
         points.push(center);
-        for (i = 0; i <= 100; i++){
+        for (var i = 0; i <= 100; i++){
             points.push(center + vec2(
                 r*Math.cos(i * 2 * Math.PI / 200),
                 r*Math.sin(i * 2 * Math.PI / 200) 
@@ -90,18 +119,6 @@ window.onload = function init() {
         }
     }
   });
-
-  /*
-  var center = vec2(event.clientX, event.clientY); 
-   
-    points.push(center);
-    for (i = 0; i <= 100; i++){
-        points.push(center + vec2(
-            r*Math.cos(i * 2 * Math.PI / 200),
-            r*Math.sin(i * 2 * Math.PI / 200) 
-        ));
-    }
-    */
 
   gl.viewport(0, 0, canvas.width, canvas.height);
   gl.clearColor(0.8, 0.8, 0.8, 1.0);
