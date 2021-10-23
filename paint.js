@@ -108,23 +108,53 @@ window.onload = function init() {
     }
 
     ////////
-    drawGradient(100, 100, 100);
-
     // Display hue.png on a canvas
-    /*
-    var hue = document.getElementById("huepicker");
-    var context = canvas.getContext("2d");
-    var img = new Image();
-    img.src = "hue.png";
-    img.onload = () => {
-      context.drawImage(img, 0, 0);
-    }*/
+    var huecanvas = document.getElementById("huepicker");
+    var huectx = huecanvas.getContext("2d");
+
+    let gradient = huectx.createLinearGradient(0, 0, 0, 512);
+    gradient.addColorStop(0, 'red');
+    gradient.addColorStop(0.15, 'orange');
+    gradient.addColorStop(0.3, 'yellow');
+    gradient.addColorStop(0.5, 'green');
+    gradient.addColorStop(0.7, 'cyan');
+    gradient.addColorStop(0.85, 'blue');
+    gradient.addColorStop(1, 'magenta');
+    
+    huectx.fillStyle = gradient;
+    huectx.fillRect(0, 0, 100, 512);
 
     // Get the r, g, b values from this canvas and pass them to:
-    var hueR, hueB, hueG;
+    var hueR, hueG, hueB;
+    huecanvas.addEventListener("click", function (e) {
+        
+        var imgData = huectx.getImageData(e.layerX, e.layerY, 1, 1);
 
-    // drawGradient(hueR, hueB, hueG);
-    /////////
+        hueR = imgData.data[0];
+        hueG = imgData.data[1];
+        hueB = imgData.data[2];
+
+        console.log(hueR, hueG, hueB);
+    });
+
+    //drawGradient(hueR, hueG, hueB);
+    drawGradient(14, 20, 30);
+    
+    // get data from huepicker and pass them to lineColor variable as vec4
+    vcp.addEventListener("click", function (e) {
+        var r, g, b, a;
+
+        var imgData = ctx.getImageData(e.layerX, e.layerY, 1, 1);
+
+        r = imgData.data[0];
+        g = imgData.data[1];
+        b = imgData.data[2];
+        a = imgData.data[3];
+
+        lineColor = vec4( r / 255,  g / 255, b / 255, 1.0);
+
+        colorPicker = true;
+    });
 
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) {
@@ -137,22 +167,7 @@ window.onload = function init() {
         cindex = option.selectedIndex;
         colorPicker = false;
     });
-
-    vcp.addEventListener("click", function(){
-        
-    });
-
-    var colorInput = document.getElementById("colorInput");
-    colorInput.addEventListener("click", () => {
-        var r, g, b;
-        //lineColor = HSVtoRGB(colorInput.value);
-        
-        //colorInput.value;
-
-        lineColor = vec4(r, g, b, 1.0);
-        colorPicker = true;
-    });
-
+    
     /*
     function HSVtoRGB(h, s, v) {
         var r, g, b, i, f, p, q, t;
