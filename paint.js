@@ -45,8 +45,86 @@ function colorChange(newValue)
 
 window.onload = function init() {
     canvas = document.getElementById("gl-canvas");
+
     // visual color picker
     vcp = document.getElementById("colorpicker");
+    var ctx = vcp.getContext("2d");
+    
+    vcp.width = 255;
+    vcp.height = 255;
+    
+
+    function drawGradient(r, g, b) {
+        var col = rgbToLSH(r, g, b);
+        var gradB = ctx.createLinearGradient(0, 0, 0, 255);
+        gradB.addColorStop(0, "white");
+        gradB.addColorStop(1, "black");
+        var gradC = ctx.createLinearGradient(0, 0, 255, 0);
+        gradC.addColorStop(0, `hsla(${Math.floor(col.hue)},100%,50%,0)`);
+        gradC.addColorStop(1, `hsla(${Math.floor(col.hue)},100%,50%,1)`);
+
+        ctx.fillStyle = gradB;
+        ctx.fillRect(0, 0, 255, 255);
+        ctx.fillStyle = gradC;
+        ctx.globalCompositeOperation = "multiply";
+        ctx.fillRect(0, 0, 255, 255);
+        ctx.globalCompositeOperation = "source-over";
+    }
+
+    function rgbToLSH(red, green, blue, result = {}) {
+        var hue, sat, lum, min, max, dif, r, g, b;
+        r = red / 255;
+        g = green / 255;
+        b = blue / 255;
+        min = Math.min(r, g, b);
+        max = Math.max(r, g, b);
+        lum = (min + max) / 2;
+        if (min === max) {
+            hue = 0;
+            sat = 0;
+        } else {
+            dif = max - min;
+            sat = lum > 0.5 ? dif / (2 - max - min) : dif / (max + min);
+            switch (max) {
+            case r:
+                hue = (g - b) / dif;
+                break;
+            case g:
+                hue = 2 + ((b - r) / dif);
+                break;
+            case b:
+                hue = 4 + ((r - g) / dif);
+                break;
+            }
+            hue *= 60;
+            if (hue < 0) {
+            hue += 360;
+            }
+        }
+        result.lum = lum * 255;
+        result.sat = sat * 255;
+        result.hue = hue;
+        return result;
+    }
+
+    ////////
+    drawGradient(100, 100, 100);
+
+    // Display hue.png on a canvas
+    /*
+    var hue = document.getElementById("huepicker");
+    var context = canvas.getContext("2d");
+    var img = new Image();
+    img.src = "hue.png";
+    img.onload = () => {
+      context.drawImage(img, 0, 0);
+    }*/
+
+    // Get the r, g, b values from this canvas and pass them to:
+    var hueR, hueB, hueG;
+
+    // drawGradient(hueR, hueB, hueG);
+    /////////
 
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) {
@@ -57,11 +135,49 @@ window.onload = function init() {
 
     option.addEventListener("click", function() {
         cindex = option.selectedIndex;
+        colorPicker = false;
     });
 
     vcp.addEventListener("click", function(){
         
     });
+
+    var colorInput = document.getElementById("colorInput");
+    colorInput.addEventListener("click", () => {
+        var r, g, b;
+        //lineColor = HSVtoRGB(colorInput.value);
+        
+        //colorInput.value;
+
+        lineColor = vec4(r, g, b, 1.0);
+        colorPicker = true;
+    });
+
+    /*
+    function HSVtoRGB(h, s, v) {
+        var r, g, b, i, f, p, q, t;
+        if (arguments.length === 1) {
+            s = h.s, v = h.v, h = h.h;
+        }
+        i = Math.floor(h * 6);
+        f = h * 6 - i;
+        p = v * (1 - s);
+        q = v * (1 - f * s);
+        t = v * (1 - (1 - f) * s);
+        switch (i % 6) {
+            case 0: r = v, g = t, b = p; break;
+            case 1: r = q, g = v, b = p; break;
+            case 2: r = p, g = v, b = t; break;
+            case 3: r = p, g = q, b = v; break;
+            case 4: r = t, g = p, b = v; break;
+            case 5: r = v, g = p, b = q; break;
+        }
+        return {
+            r: Math.round(r * 255),
+            g: Math.round(g * 255),
+            b: Math.round(b * 255)
+        };
+    }*/
 
     var c = document.getElementById("clearButton")
     c.addEventListener("click", function(){
