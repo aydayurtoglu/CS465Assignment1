@@ -1,6 +1,7 @@
 "use strict";
 
 var canvas;
+var vcp;
 var gl;
 
 var maxNumVertices = 20000;
@@ -34,18 +35,32 @@ var redoNo = 0;
 
 var mouseClicked = false;
 
+var lineColor = vec4(0.0, 1.0, 1.0, 1.0);
+var colorPicker = false;
+
+function colorChange(newValue)
+{
+    lineColor = newValue.color.rgb;
+}
+
 window.onload = function init() {
     canvas = document.getElementById("gl-canvas");
+    // visual color picker
+    vcp = document.getElementById("colorpicker");
 
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) {
         alert("WebGL isn't available");
     }
 
-    var m = document.getElementById("mymenu");
+    var option = document.getElementById("mymenu");
 
-    m.addEventListener("click", function() {
-        cindex = m.selectedIndex;
+    option.addEventListener("click", function() {
+        cindex = option.selectedIndex;
+    });
+
+    vcp.addEventListener("click", function(){
+        
     });
 
     var c = document.getElementById("clearButton")
@@ -124,7 +139,10 @@ window.onload = function init() {
             gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
             gl.bufferSubData(gl.ARRAY_BUFFER, 8 * index, flatten(t));
 
-            t = vec4(colors[cindex]);
+            if (!colorPicker)
+                t = vec4(colors[cindex]);
+            else
+                t = lineColor;
 
             gl.bindBuffer(gl.ARRAY_BUFFER, cBufferId);
             gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(t));
