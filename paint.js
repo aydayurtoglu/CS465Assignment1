@@ -27,10 +27,14 @@ var numPolygons = 0;
 var numIndices = [];
 numIndices[0] = 0;
 var start = [0];
-var undoOperations=[10];
-var redoOperations=[10];
+
+var undoIndices = [10];
+var redoIndices = [10];
+//var undoStart = [10];
+//var redoStart = [10];
 var undoNo = 0;
 var redoNo = 0;
+
 
 var mouseClicked = false;
 
@@ -58,14 +62,18 @@ window.onload = function init() {
     });
 
     var undo = document.getElementById("undoButton")
-    undo.addEventListener("click", function(){
+    undo.addEventListener("click", function undo(){
         
-        if (undoNo == 10 || (undoNo == 0 && redoNo != 0))
+        if (undoNo == 10 || (undoNo == 0 && redoNo > 0))
             return;
 
-        else {
-            undoOperations[undoNo] = numIndices[numPolygons];
+        else {//mark noOfIndices and starting indexes of undone stroke
+            undoIndices[undoNo] = numIndices[numPolygons];
+            //undoStart[undoNo] = start[numPolygons];
+            //clear info from main arrays
             numIndices[numPolygons] = 0;
+            //start[numPolygons] = 0;
+            //increase undoNo and decrease numPolygons
             numPolygons--;
             undoNo++;
         }
@@ -75,19 +83,25 @@ window.onload = function init() {
 
     var redo = document.getElementById("clearButton")
     redo.addEventListener("click", function redo(){
-
-        //redo a Stroke by pulling data from redoOperations array
-        if (redoNo != 0 && undoNo == 0 ){
+        
+        //redo a Stroke by pulling data from redoIndices array
+        if (redoNo > 0 && undoNo == 0 ){
             numPolygons++;
-            numIndices[numPolygons] = redoOperations[redoNo];
-            redoOperations[redoNo] = 0;
+            numIndices[numPolygons] = redoIndices[redoNo];
+            //start[numPolygons] = redoStart[redoNo];
+
+            redoIndices[redoNo] = 0;
+            //redoStart[redoNo] = 0;
             redoNo--;
         }
-        //redo a stroke by pulling data from undoOperations array
-        else if (undoNo != 0) {
+        //redo a stroke by pulling data from undoIndices array
+        else if (undoNo > 0) {
             numPolygons++;
-            numIndices[numPolygons] = undoOperations[undoNo];
-            undoOperations[undoNo] = 0;
+            numIndices[numPolygons] = undoIndices[undoNo];
+            //start[numPolygons] = undoStart[redoNo];
+
+            undoIndices[undoNo] = 0;
+            //undoStart[redoNo] = 0;
             undoNo--;
         }
         else {
@@ -99,14 +113,16 @@ window.onload = function init() {
   
     canvas.addEventListener("mousedown", function draw(event){
         mouseClicked = true;
-
+        
         for (var i = undoNo; i > 0; i-- ){
-            redoOperations[i] = undoOperations[i];
-            undoOperations[i] = 0;
+            redoIndices[i] = undoIndices[i];
+            //redoStart[i] = undoStart[i];
+            undoIndices[i] = 0;
+            //undoStart[i] = 0;
         }
         redoNo = undoNo;
         undoNo = 0;
-
+        
         numPolygons++;
         numIndices[numPolygons] = 0;
         start[numPolygons] = index;
@@ -114,6 +130,9 @@ window.onload = function init() {
   
     canvas.addEventListener("mouseup", function release(event){
         mouseClicked = false;
+
+        redoNo = 0;
+        redoIndices = [0];
     });
   
     canvas.addEventListener("mousemove", function stroke(event) {
@@ -131,7 +150,7 @@ window.onload = function init() {
 
             numIndices[numPolygons]++;
             index++;
-
+            
             var center = vec2(event.clientX, event.clientY); 
     
             points.push(center);
