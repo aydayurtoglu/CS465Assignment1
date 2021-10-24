@@ -109,6 +109,7 @@ window.onload = function init() {
 
     ////////
     // Display hue.png on a canvas
+    drawGradient(0, 0, 0);
     var huecanvas = document.getElementById("huepicker");
     var huectx = huecanvas.getContext("2d");
 
@@ -133,13 +134,9 @@ window.onload = function init() {
         hueR = imgData.data[0];
         hueG = imgData.data[1];
         hueB = imgData.data[2];
-
-        console.log(hueR, hueG, hueB);
+        
+        drawGradient(hueR, hueG, hueB);
     });
-
-    //drawGradient(hueR, hueG, hueB);
-    drawGradient(14, 20, 30);
-    
     // get data from huepicker and pass them to lineColor variable as vec4
     vcp.addEventListener("click", function (e) {
         var r, g, b, a;
