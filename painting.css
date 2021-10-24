@@ -1,41 +1,31 @@
 body {
     background-color: #A9A9A9;
-    margin: 1% 20%;
-    padding: 10px;
+    margin: 0;
+    padding: 0;
     font-family: sans-serif;
 }
 
-canvas {
-    display: block;
-    margin: 20px auto;
-    float: right;
+.flex-container {
+    display: flex;
+    flex-direction: row;
+}
+  
+.flex-color {
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
 }
 
-h1 {
-    text-align: center;
-    text-shadow: -2px 2px 3px White;
-    font-family: "Comic Sans MS", sans-serif;
+.flex-hue {
+    margin-left: 10px;
 }
 
-input[type="range"] {
-    width: 275px;
+.mymenu {
+    margin-left: 10px;
+    width: 64px;
+    height: 512px;
 }
 
-
-#lineWidthSlider {
-    margin: 0px 0px 10px 20px;
-}
-
-#colorInput {
-    margin-left: 35px;
-}
-
-#canvasColorInput {
-    margin: 0px 0px 20px 35px;
-}
-
-#menu {
-    padding: 5px;
-    text-align: center;
-    float: left;
+.mymenu .option {
+    height: 64px;
 }

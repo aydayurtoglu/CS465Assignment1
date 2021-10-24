@@ -1,4 +1,5 @@
 <html>
+  <link rel="stylesheet" href="painting.css">
 <script id="vertex-shader" type="x-shader/x-vertex">
   attribute vec4 vPosition; attribute vec4 vColor; varying vec4 fColor; void main() { gl_Position = vPosition; fColor = vColor; }
 </script>
@@ -13,24 +14,37 @@
 <script type="text/javascript" src="paint.js"></script>
 
 <body>
-  <div>
-    <div>
-      <canvas id="gl-canvas" style="float:left" width="512" height="512">
+  <div class="flex-container">
+    <div class="flex-canvas">
+      <canvas id="gl-canvas" width="512" height="512">
         Oops ... your browser doesn't support the HTML5 canvas element
       </canvas>
     </div>
-    <div>
-        <canvas id="showColor" style="float:left" width="100" height="100">
+    <div class="flex-color"> 
+        <canvas id="showColor" width="100" height="100">
         Oops ... your browser doesn't support the HTML5 canvas element
         </canvas>
-        <canvas id="colorpicker" style="float:left" width="256" height="256">
+        <canvas id="colorpicker" width="256" height="256">
         Oops ... your browser doesn't support the HTML5 canvas element
         </canvas>
     </div>
-    <div>
+    <div class="flex-hue">
       <canvas id="huepicker" width="100" height="512">
         Oops ... your browser doesn't support the HTML5 canvas element
       </canvas>
+    </div>
+    <div>
+      <select class="mymenu" id="mymenu" size="8 ">
+        <option class="option" value="0 " style="background-color: black;"></option>
+        <option class="option" value="1 " style="background-color: red;"></option>
+        <option class="option" value="2 " style="background-color: yellow;"></option>
+        <option class="option" value="3 " style="background-color: green;"></option>
+        <option class="option" value="4 " style="background-color: blue;"></option>
+        <option class="option" value="5 " style="background-color: magenta;"></option>
+        <option class="option" value="6 " style="background-color: cyan;"></option>
+        <option class="option" value="7 " style="background-color: white;"></option>
+      </select>
+      
     </div>
   </div>
 
@@ -39,20 +53,9 @@
       <button id="saveButton">Save</button>
       <button id="loadButton">Load</button>
     </div>
+    
     <div>
-      <select id="mymenu" style="width:20px" size="8 ">
-        <option value="0 " style="background-color: black;"></option>
-        <option value="1 " style="background-color: red;"></option>
-        <option value="2 " style="background-color: yellow;"></option>
-        <option value="3 " style="background-color: green;"></option>
-        <option value="4 " style="background-color: blue;"></option>
-        <option value="5 " style="background-color: magenta;"></option>
-        <option value="6 " style="background-color: cyan;"></option>
-        <option value="7 " style="background-color: white;"></option>
-      </select>
       <button id="clearButton">Clear</button>
-    </div>
-    <div>
       <button id="undoButton">Undo</button>
       <button id="redoButton">Redo</button>
     </div>

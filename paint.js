@@ -128,7 +128,6 @@ window.onload = function init() {
 
     // Get the r, g, b values from this canvas and pass them to:
     var hueR, hueG, hueB;
-
     huecanvas.addEventListener("click", function (e) {
         
         var imgData = huectx.getImageData(e.layerX, e.layerY, 1, 1);
@@ -139,12 +138,13 @@ window.onload = function init() {
         
         drawGradient(hueR, hueG, hueB);
     });
+
     // Show the color on a canvas
     var colorCanvas = document.getElementById("showColor");
     var colorctx = colorCanvas.getContext("2d");
-    colorctx.fillStyle = "black";
+    colorctx.fillStyle = lineColor;
     colorctx.fillRect(0, 0, colorCanvas.width, colorCanvas.height);
-
+    
     // get data from huepicker and pass them to lineColor variable as vec4
     vcp.addEventListener("click", function (e) {
         var r, g, b, a;
@@ -250,7 +250,6 @@ window.onload = function init() {
         
     });
    
-
     var save = document.getElementById("saveButton")
     save.addEventListener("click", function save(){
         capture = true;
