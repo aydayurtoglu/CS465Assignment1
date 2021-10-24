@@ -34,7 +34,8 @@ var undoNo = 0;
 var redoNo = 0;
 
 var mouseClicked = false;
-
+var capture = false;
+var loadCanvas = false;
 var lineColor = vec4(0.0, 1.0, 1.0, 1.0);
 var colorPicker = false;
 
@@ -127,6 +128,7 @@ window.onload = function init() {
 
     // Get the r, g, b values from this canvas and pass them to:
     var hueR, hueG, hueB;
+
     huecanvas.addEventListener("click", function (e) {
         
         var imgData = huectx.getImageData(e.layerX, e.layerY, 1, 1);
@@ -137,6 +139,12 @@ window.onload = function init() {
         
         drawGradient(hueR, hueG, hueB);
     });
+    // Show the color on a canvas
+    var colorCanvas = document.getElementById("showColor");
+    var colorctx = colorCanvas.getContext("2d");
+    colorctx.fillStyle = "black";
+    colorctx.fillRect(0, 0, colorCanvas.width, colorCanvas.height);
+
     // get data from huepicker and pass them to lineColor variable as vec4
     vcp.addEventListener("click", function (e) {
         var r, g, b, a;
@@ -150,10 +158,14 @@ window.onload = function init() {
 
         lineColor = vec4( r / 255,  g / 255, b / 255, 1.0);
 
+        colorctx.fillStyle = 'rgb(' + r + ', ' + g + ',' + b + ')';
+        colorctx.fillRect(0, 0, colorCanvas.width, colorCanvas.height);
+
         colorPicker = true;
     });
 
-    gl = WebGLUtils.setupWebGL(canvas);
+    //gl = WebGLUtils.setupWebGL(canvas);
+    gl = canvas.getContext("experimental-webgl", {preserveDrawingBuffer: true});
     if (!gl) {
         alert("WebGL isn't available");
     }
@@ -212,8 +224,6 @@ window.onload = function init() {
             numPolygons--;
             undoNo++;
         }
-        
-
     });
 
     var redo = document.getElementById("clearButton")
@@ -239,7 +249,19 @@ window.onload = function init() {
         
         
     });
-  
+   
+
+    var save = document.getElementById("saveButton")
+    save.addEventListener("click", function save(){
+        capture = true;
+    });
+    
+    var load = document.getElementById("loadButton")
+    load.addEventListener("click", function save(){
+        loadCanvas = true;
+        
+    });
+
     canvas.addEventListener("mousedown", function draw(event){
         mouseClicked = true;
 
@@ -318,16 +340,23 @@ window.onload = function init() {
 }
 
 function render() {
+    if (capture) {
+        capture = false;
+
+        var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+        window.location.href=image;
+    }
 
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    for (var i = 0; i <= numPolygons; i++) {
-        gl.drawArrays(gl.LINE_STRIP, start[i], numIndices[i]);
-    }
-
+        for (var i = 0; i <= numPolygons; i++) {
+            gl.drawArrays(gl.LINE_STRIP, start[i], numIndices[i]);
+        }
+    
     setTimeout(
         function() {
             requestAnimFrame(render);
         }, delay
     );
+
 }
