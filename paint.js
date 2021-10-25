@@ -361,6 +361,7 @@ window.onload = function init() {
             gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(color));
 
             index = index + 16;
+            numIndices[numPolygons]++;
         }
     });
 
@@ -403,12 +404,13 @@ function render() {
     }
 
     gl.clear(gl.COLOR_BUFFER_BIT);
-/*
-    for (var i = 0; i <= numPolygons; i++) {
-        gl.drawArrays(gl.TRIANGLE_STRIP, start[i], numIndices[i]);
-    }*/
 
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, index);
+    for (var i = 0; i <= numPolygons; i++) {
+        //   gl.drawArrays(gl.TRIANGLE_STRIP, start[i], index);
+
+        gl.drawArrays(gl.TRIANGLE_STRIP, start[i], numIndices[i]);
+    }
+    //gl.drawArrays(gl.TRIANGLE_STRIP, 0, index);
     
     requestAnimFrame(render);
 
