@@ -6,7 +6,6 @@ var gl;
 
 var maxNumVertices = 20000;
 var index = 0;
-
 var delay = 50;
 
 var cindex = 0;
@@ -35,7 +34,6 @@ var redoIndices = [10];
 //var redoStart = [10];
 var undoNo = 0;
 var redoNo = 0;
-
 
 var mouseClicked = false;
 var capture = false;
@@ -301,10 +299,20 @@ window.onload = function init() {
   
     canvas.addEventListener("mousemove", function stroke(event) {
         if(mouseClicked){
+/*
+            var center = vec2(event.clientX, event.clientY);
             var r = 2000;
-            t = vec2(2 * event.clientX / canvas.width - 1,
-                2 * (canvas.height - event.clientY) / canvas.height - 1);
-            gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
+            points.push(center);
+            for (var i = 0; i <= 100; i++){
+                points.push(center + vec2(
+                    r*Math.cos(i * 2 * Math.PI / 200),
+                    r*Math.sin(i * 2 * Math.PI / 200) 
+                ));
+            }*/
+
+            t = vec2(2*event.clientX/canvas.width-1,
+                2*(canvas.height-event.clientY)/canvas.height-1);
+            gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
             gl.bufferSubData(gl.ARRAY_BUFFER, 8 * index, flatten(t));
 
             if (!colorPicker)
@@ -312,21 +320,11 @@ window.onload = function init() {
             else
                 t = lineColor;
 
-            gl.bindBuffer(gl.ARRAY_BUFFER, cBufferId);
+            gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
             gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(t));
 
             numIndices[numPolygons]++;
             index++;
-            
-            var center = vec2(event.clientX, event.clientY); 
-    
-            points.push(center);
-            for (var i = 0; i <= 100; i++){
-                points.push(center + vec2(
-                    r*Math.cos(i * 2 * Math.PI / 200),
-                    r*Math.sin(i * 2 * Math.PI / 200) 
-                ));
-            }
         }
     });
 
@@ -340,19 +338,22 @@ window.onload = function init() {
     var program = initShaders(gl, "vertex-shader", "fragment-shader");
     gl.useProgram(program);
 
-    var bufferId = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
-    gl.bufferData(gl.ARRAY_BUFFER, 8 * maxNumVertices, gl.STATIC_DRAW);
-    var vPos = gl.getAttribLocation(program, "vPosition");
-    gl.vertexAttribPointer(vPos, 2, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(vPos);
 
-    var cBufferId = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, cBufferId);
+    var cBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, 16 * maxNumVertices, gl.STATIC_DRAW);
+
     var vColor = gl.getAttribLocation(program, "vColor");
     gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vColor);
+
+    var vBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, 8 * maxNumVertices, gl.STATIC_DRAW);
+
+    var vPos = gl.getAttribLocation(program, "vPosition");
+    gl.vertexAttribPointer(vPos, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(vPos);
 
     render();
 }
@@ -367,14 +368,12 @@ function render() {
 
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-        for (var i = 0; i <= numPolygons; i++) {
-            gl.drawArrays(gl.LINE_STRIP, start[i], numIndices[i]);
-        }
+    for (var i = 0; i <= numPolygons; i++) {
+        gl.drawArrays(gl.LINE_STRIP, start[i], numIndices[i]);
+    }
+
+    //gl.drawArrays(gl.LINE_STRIP, 0, index);
     
-    setTimeout(
-        function() {
-            requestAnimFrame(render);
-        }, delay
-    );
+    requestAnimFrame(render);
 
 }

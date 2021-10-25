@@ -1,12 +1,20 @@
 <html>
   <link rel="stylesheet" href="painting.css">
 <script id="vertex-shader" type="x-shader/x-vertex">
-  attribute vec4 vPosition; attribute vec4 vColor; varying vec4 fColor; void main() { gl_Position = vPosition; fColor = vColor; }
+  attribute vec4 vPosition; attribute vec4 vColor; varying vec4 fColor; 
+  void main() { 
+    gl_Position = vPosition; 
+    fColor = vColor; 
+    gl_PointSize = 10.0;
+  }
 </script>
 
 <script id="fragment-shader" type="x-shader/x-fragment">
 
-  precision mediump float; varying vec4 fColor; void main() { gl_FragColor = fColor; }
+  precision mediump float; varying vec4 fColor; 
+  void main() { 
+    gl_FragColor = fColor; 
+  }
 </script>
 <script type="text/javascript" src="common/webgl-utils.js"></script>
 <script type="text/javascript" src="common/initShaders.js"></script>
@@ -44,7 +52,6 @@
         <option class="option" value="6 " style="background-color: cyan;"></option>
         <option class="option" value="7 " style="background-color: white;"></option>
       </select>
-      
     </div>
   </div>
 
@@ -58,6 +65,14 @@
       <button id="clearButton">Clear</button>
       <button id="undoButton">Undo</button>
       <button id="redoButton">Redo</button>
+    </div>
+    <div>
+      <select class="layers" id="layers" size="4 ">
+        <option class="layer" value="0 ">Layer 1</option>
+        <option class="layer" value="1 ">Layer 2</option>
+        <option class="layer" value="2 ">Layer 3</option>
+        <option class="layer" value="3 ">Layer 4</option>
+      </select>
     </div>
   </div>
 </body>
