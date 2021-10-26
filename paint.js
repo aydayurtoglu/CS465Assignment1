@@ -41,6 +41,9 @@ var loadCanvas = false;
 var lineColor = vec4(0.0, 1.0, 1.0, 1.0);
 var colorPicker = false;
 
+var isShape = false;
+var shapeNo;
+
 function colorChange(newValue)
 {
     lineColor = newValue.color.rgb;
@@ -178,32 +181,6 @@ window.onload = function init() {
         cindex = option.selectedIndex;
         colorPicker = false;
     });
-    
-    /*
-    function HSVtoRGB(h, s, v) {
-        var r, g, b, i, f, p, q, t;
-        if (arguments.length === 1) {
-            s = h.s, v = h.v, h = h.h;
-        }
-        i = Math.floor(h * 6);
-        f = h * 6 - i;
-        p = v * (1 - s);
-        q = v * (1 - f * s);
-        t = v * (1 - (1 - f) * s);
-        switch (i % 6) {
-            case 0: r = v, g = t, b = p; break;
-            case 1: r = q, g = v, b = p; break;
-            case 2: r = p, g = v, b = t; break;
-            case 3: r = p, g = q, b = v; break;
-            case 4: r = t, g = p, b = v; break;
-            case 5: r = v, g = p, b = q; break;
-        }
-        return {
-            r: Math.round(r * 255),
-            g: Math.round(g * 255),
-            b: Math.round(b * 255)
-        };
-    }*/
 
     var c = document.getElementById("clearButton")
     c.addEventListener("click", function(){
@@ -298,7 +275,7 @@ window.onload = function init() {
     });
   
     canvas.addEventListener("mousemove", function stroke(event) {
-        if(mouseClicked){
+        if(mouseClicked && !isShape){
             var color = new Array(16);
             
             gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
@@ -365,6 +342,39 @@ window.onload = function init() {
         }
     });
 
+    canvas.addEventListener("mousemove", function drawShape(event) {
+        if(mouseClicked && isShape){
+            var color = new Array(4);
+            
+            gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+
+            if (!colorPicker){
+                for (var i = 0; i < color.length ; i++) 
+                {
+                    color[i] = vec4(colors[cindex]);
+                }
+            }
+            else {
+                for (var i = 0; i < color.length ; i++) 
+                {
+                    color[i] = lineColor;
+                }
+            }
+
+            if (shapeNo == 0){}
+            
+            if (shapeNo == 1){}
+
+            if (shapeNo == 2){}
+        }
+    });
+
+    var shapeList = document.getElementById("shapes");
+    shapeList.addEventListener("click", function() {
+        isShape = true;
+        shapeNo = shapeList.selectedIndex;
+    });
+
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(0.8, 0.8, 0.8, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
@@ -406,11 +416,16 @@ function render() {
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     for (var i = 0; i <= numPolygons; i++) {
-        //   gl.drawArrays(gl.TRIANGLE_STRIP, start[i], index);
+        if (!isShape)
+            gl.drawArrays(gl.TRIANGLE_STRIP, start[i], numIndices[i]*16);
+        else {
+            if (shapeNo == 0){}
+            //gl.drawArrays(gl.TRIANGLE_STRIP, start[i], numIndices[i]*4);
+            if (shapeNo == 1){}
 
-        gl.drawArrays(gl.TRIANGLE_STRIP, start[i], numIndices[i]*16);
+            if (shapeNo == 2){}
+        }
     }
-    //gl.drawArrays(gl.TRIANGLE_STRIP, 0, index);
     
     requestAnimFrame(render);
 

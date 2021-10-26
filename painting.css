@@ -29,3 +29,8 @@ body {
 .mymenu .option {
     height: 64px;
 }
+
+.menus {
+    display: flex;
+    flex-direction: row;
+}
