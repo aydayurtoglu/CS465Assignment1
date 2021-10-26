@@ -408,7 +408,7 @@ function render() {
     for (var i = 0; i <= numPolygons; i++) {
         //   gl.drawArrays(gl.TRIANGLE_STRIP, start[i], index);
 
-        gl.drawArrays(gl.TRIANGLE_STRIP, start[i], numIndices[i]);
+        gl.drawArrays(gl.TRIANGLE_STRIP, start[i], numIndices[i]*16);
     }
     //gl.drawArrays(gl.TRIANGLE_STRIP, 0, index);
     
