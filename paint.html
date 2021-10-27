@@ -1,11 +1,12 @@
 <html>
   <link rel="stylesheet" href="painting.css">
 <script id="vertex-shader" type="x-shader/x-vertex">
-  attribute vec4 vPosition; attribute vec4 vColor; varying vec4 fColor; 
+  attribute vec4 vPosition; 
+  attribute vec4 vColor; 
+  varying vec4 fColor; 
   void main() { 
-    gl_Position = vPosition; 
-    fColor = vColor; 
-    gl_PointSize = 10.0;
+    gl_Position = vPosition;
+    fColor = vColor;
   }
 </script>
 
@@ -60,7 +61,10 @@
       <button id="saveButton">Save</button>
       <button id="loadButton">Load</button>
     </div>
-    
+    <div>
+      <button id="brushButton">Brush</button>
+      <button id="eraserButton">Eraser</button>
+    </div>
     <div>
       <button id="clearButton">Clear</button>
       <button id="undoButton">Undo</button>

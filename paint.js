@@ -4,13 +4,12 @@ var canvas;
 var vcp;
 var gl;
 
-var maxNumVertices = 20000;
+var maxNumVertices = 200000;
 var index = 0;
 var delay = 50;
 
 var cindex = 0;
 var strokeIndex = 0;
-var points =  [];
 var vertices;
 var colors = [
   vec4(0.0, 0.0, 0.0, 1.0), // black
@@ -39,7 +38,9 @@ var colorPicker = false;
 
 var isShape = false;
 var shapeNo;
-
+var brush = true;
+var layerNo = 3;
+var layer = 0.8;
 function colorChange(newValue)
 {
     lineColor = newValue.color.rgb;
@@ -109,7 +110,6 @@ window.onload = function init() {
         return result;
     }
 
-    ////////
     // Display hue.png on a canvas
     drawGradient(0, 0, 0);
     var huecanvas = document.getElementById("huepicker");
@@ -172,7 +172,6 @@ window.onload = function init() {
     }
 
     var option = document.getElementById("mymenu");
-
     option.addEventListener("click", function() {
         cindex = option.selectedIndex;
         colorPicker = false;
@@ -227,7 +226,6 @@ window.onload = function init() {
     var load = document.getElementById("loadButton")
     load.addEventListener("click", function save(){
         loadCanvas = true;
-        
     });
 
     canvas.addEventListener("mousedown", function draw(event){
@@ -244,11 +242,8 @@ window.onload = function init() {
     });
   
     canvas.addEventListener("mousemove", function stroke(event) {
-        if(mouseClicked && !isShape){
+        if(mouseClicked && !isShape && brush){
             var color = new Array(16);
-            
-            gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-
             if (!colorPicker){
                 for (var i = 0; i < color.length ; i++) 
                 {
@@ -261,48 +256,62 @@ window.onload = function init() {
                     color[i] = lineColor;
                 }
             }
+            // near
+            if (layerNo == 0)
+                layer = 0.2;
 
+            if (layerNo == 1)
+                layer = 0.4;
+
+            if (layerNo == 2)
+                layer = 0.6;
+            // far
+            if (layerNo == 3)
+                layer = 0.8;
+
+            console.log(layer);
             var radius = 0.04;
         
             vertices = [
-                vec2(2*event.clientX/canvas.width-1,
-                    (2*(canvas.height-event.clientY)/canvas.height-1)+radius),
-                vec2((2*event.clientX/canvas.width-1)+radius,
-                    2*(canvas.height-event.clientY)/canvas.height-1),
-                vec2((2*event.clientX/canvas.width-1)-radius,
-                    2*(canvas.height-event.clientY)/canvas.height-1),
-                vec2((2*event.clientX/canvas.width-1),
-                     (2*(canvas.height-event.clientY)/canvas.height-1)-radius),
+                vec4(2*event.clientX/canvas.width-1,
+                    (2*(canvas.height-event.clientY)/canvas.height-1)+radius, layer, 1.0),
+                vec4((2*event.clientX/canvas.width-1)+radius,
+                    2*(canvas.height-event.clientY)/canvas.height-1, layer, 1.0),
+                vec4((2*event.clientX/canvas.width-1)-radius,
+                    2*(canvas.height-event.clientY)/canvas.height-1, layer, 1.0),
+                vec4((2*event.clientX/canvas.width-1),
+                     (2*(canvas.height-event.clientY)/canvas.height-1)-radius, layer, 1.0),
                 
-                vec2((2*event.clientX/canvas.width-1)+radius*Math.sqrt(2)/2,
-                     (2*(canvas.height-event.clientY)/canvas.height-1)+radius*Math.sqrt(2)/2),
-                vec2((2*event.clientX/canvas.width-1)+radius*Math.sqrt(2)/2,
-                     (2*(canvas.height-event.clientY)/canvas.height-1)-radius*Math.sqrt(2)/2),
-                vec2((2*event.clientX/canvas.width-1)-radius*Math.sqrt(2)/2,
-                    (2*(canvas.height-event.clientY)/canvas.height-1)+radius*Math.sqrt(2)/2),
-                vec2((2*event.clientX/canvas.width-1)-radius*Math.sqrt(2)/2,
-                     (2*(canvas.height-event.clientY)/canvas.height-1)-radius*Math.sqrt(2)/2),
+                vec4((2*event.clientX/canvas.width-1)+radius*Math.sqrt(2)/2,
+                     (2*(canvas.height-event.clientY)/canvas.height-1)+radius*Math.sqrt(2)/2, layer, 1.0),
+                vec4((2*event.clientX/canvas.width-1)+radius*Math.sqrt(2)/2,
+                     (2*(canvas.height-event.clientY)/canvas.height-1)-radius*Math.sqrt(2)/2, layer, 1.0),
+                vec4((2*event.clientX/canvas.width-1)-radius*Math.sqrt(2)/2,
+                    (2*(canvas.height-event.clientY)/canvas.height-1)+radius*Math.sqrt(2)/2, layer, 1.0),
+                vec4((2*event.clientX/canvas.width-1)-radius*Math.sqrt(2)/2,
+                     (2*(canvas.height-event.clientY)/canvas.height-1)-radius*Math.sqrt(2)/2, layer, 1.0),
                 
-                vec2((2*event.clientX/canvas.width-1)+radius/2,
-                     (2*(canvas.height-event.clientY)/canvas.height-1)+radius*Math.sqrt(3)/2),
-                vec2((2*event.clientX/canvas.width-1)+radius*Math.sqrt(3)/2,
-                     (2*(canvas.height-event.clientY)/canvas.height-1)-radius/2),
-                vec2((2*event.clientX/canvas.width-1)-radius/2,
-                    (2*(canvas.height-event.clientY)/canvas.height-1)+radius*Math.sqrt(3)/2),
-                vec2((2*event.clientX/canvas.width-1)-radius/2,
-                     (2*(canvas.height-event.clientY)/canvas.height-1)-radius*Math.sqrt(3)/2),
+                vec4((2*event.clientX/canvas.width-1)+radius/2,
+                     (2*(canvas.height-event.clientY)/canvas.height-1)+radius*Math.sqrt(3)/2, layer, 1.0),
+                vec4((2*event.clientX/canvas.width-1)+radius*Math.sqrt(3)/2,
+                     (2*(canvas.height-event.clientY)/canvas.height-1)-radius/2, layer, 1.0),
+                vec4((2*event.clientX/canvas.width-1)-radius/2,
+                    (2*(canvas.height-event.clientY)/canvas.height-1)+radius*Math.sqrt(3)/2, layer, 1.0),
+                vec4((2*event.clientX/canvas.width-1)-radius/2,
+                     (2*(canvas.height-event.clientY)/canvas.height-1)-radius*Math.sqrt(3)/2, layer, 1.0),
 
-                vec2((2*event.clientX/canvas.width-1)+radius*Math.sqrt(3)/2,
-                     (2*(canvas.height-event.clientY)/canvas.height-1)+radius/2),
-                vec2((2*event.clientX/canvas.width-1)+radius/2,
-                     (2*(canvas.height-event.clientY)/canvas.height-1)-radius*Math.sqrt(3)/2),
-                vec2((2*event.clientX/canvas.width-1)-radius*Math.sqrt(3)/2,
-                    (2*(canvas.height-event.clientY)/canvas.height-1)+radius/2),
-                vec2((2*event.clientX/canvas.width-1)-radius*Math.sqrt(3)/2,
-                     (2*(canvas.height-event.clientY)/canvas.height-1)-radius/2),
+                vec4((2*event.clientX/canvas.width-1)+radius*Math.sqrt(3)/2,
+                     (2*(canvas.height-event.clientY)/canvas.height-1)+radius/2, layer, 1.0),
+                vec4((2*event.clientX/canvas.width-1)+radius/2,
+                     (2*(canvas.height-event.clientY)/canvas.height-1)-radius*Math.sqrt(3)/2, layer, 1.0),
+                vec4((2*event.clientX/canvas.width-1)-radius*Math.sqrt(3)/2,
+                    (2*(canvas.height-event.clientY)/canvas.height-1)+radius/2, layer, 1.0),
+                vec4((2*event.clientX/canvas.width-1)-radius*Math.sqrt(3)/2,
+                     (2*(canvas.height-event.clientY)/canvas.height-1)-radius/2, layer, 1.0),
             ]
-            gl.bufferSubData(gl.ARRAY_BUFFER, 8 * index, flatten(vertices));
 
+            gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+            gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(vertices));
             gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
             gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(color));
 
@@ -344,6 +353,34 @@ window.onload = function init() {
         shapeNo = shapeList.selectedIndex;
     });
 
+    var brushButton = document.getElementById("brushButton");
+    brushButton.addEventListener("click", function() {
+        brush = true;
+        isShape = false;
+    });
+
+    var eraser = document.getElementById("eraserButton");
+    eraser.addEventListener("click", function() {
+        brush = false;
+        isShape = false;
+    });
+
+    canvas.addEventListener("mousemove", function erase(event) {
+        if(mouseClicked && !brush && !isShape){
+            
+
+            index = index - 16;
+            numIndices[numPolygons]--;
+        }
+    });
+
+    var layers = document.getElementById("layers");
+    layers.addEventListener("click", function() {
+        layerNo = layers.selectedIndex;
+    });
+
+    gl.enable(gl.DEPTH_TEST);
+
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(0.8, 0.8, 0.8, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
@@ -367,9 +404,9 @@ window.onload = function init() {
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, 8 * maxNumVertices, gl.STATIC_DRAW);
 
-    var vPos = gl.getAttribLocation(program, "vPosition");
-    gl.vertexAttribPointer(vPos, 2, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(vPos);
+    var vPosition = gl.getAttribLocation(program, "vPosition");
+    gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(vPosition);
 
     render();
 }
@@ -382,7 +419,7 @@ function render() {
         window.location.href=image;
     }
 
-    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     for (var i = 0; i <= numPolygons; i++) {
         if (!isShape)
@@ -395,7 +432,5 @@ function render() {
             if (shapeNo == 2){}
         }
     }
-    
     requestAnimFrame(render);
-
 }
