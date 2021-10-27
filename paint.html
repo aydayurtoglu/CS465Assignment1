@@ -72,11 +72,13 @@
     </div>
     <div class="menus">
       <select class="layers" id="layers" size="4 ">
-        <option class="layer" value="0 ">Layer 1</option>
-        <option class="layer" value="1 ">Layer 2</option>
-        <option class="layer" value="2 ">Layer 3</option>
-        <option class="layer" value="3 ">Layer 4</option>
+        <option id="layer1" value="0 ">Layer 1</option>
+        <option id="layer2" value="1 ">Layer 2</option>
+        <option id="layer3" value="2 ">Layer 3</option>
+        <option id="layer4" value="3 ">Layer 4</option>
       </select>
+      <button id="upButton" style="width: 110px;">Move selected layer up</button>
+      <button id="downButton" style="width: 110px;">Move selected layer down</button>
       <select class="shapes" id="shapes" size="3 ">
         <option class="rectangle" value="0 ">Rectangle</option>
         <option class="ellipse" value="1 ">Ellipse</option>

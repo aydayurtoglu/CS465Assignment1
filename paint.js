@@ -367,20 +367,69 @@ window.onload = function init() {
 
     canvas.addEventListener("mousemove", function erase(event) {
         if(mouseClicked && !brush && !isShape){
-            
-
             index = index - 16;
             numIndices[numPolygons]--;
         }
     });
 
+    var layerchosen = false;
     var layers = document.getElementById("layers");
     layers.addEventListener("click", function() {
         layerNo = layers.selectedIndex;
+        layerchosen = true;
+    });
+
+    var upButton = document.getElementById("upButton");
+    upButton.addEventListener("click", function() {
+        if (layerchosen && layerNo != 0) {
+            // switch layer names
+            var temp;
+            switch(layerNo) {
+                case 1:
+                    temp = document.getElementById("layer1").innerHTML;
+                    document.getElementById("layer1").innerHTML = document.getElementById("layer2").innerHTML ;
+                    document.getElementById("layer2").innerHTML = temp;
+                    break;
+                case 2:
+                    temp = document.getElementById("layer3").innerHTML;
+                    document.getElementById("layer3").innerHTML = document.getElementById("layer2").innerHTML;
+                    document.getElementById("layer2").innerHTML = temp;
+                    break;
+                case 3:
+                    temp = document.getElementById("layer4").innerHTML;
+                    document.getElementById("layer4").innerHTML = document.getElementById("layer3").innerHTML;
+                    document.getElementById("layer3").innerHTML = temp;
+                    break;
+            }
+        }
+    });
+
+    var downButton = document.getElementById("downButton");
+    downButton.addEventListener("click", function() {
+        if (layerchosen && layerNo != 3) {
+            // switch layer names
+            var temp;
+            switch(layerNo) {
+                case 0:
+                    temp = document.getElementById("layer1").innerHTML;
+                    document.getElementById("layer1").innerHTML = document.getElementById("layer2").innerHTML ;
+                    document.getElementById("layer2").innerHTML = temp;
+                    break;
+                case 1:
+                    temp = document.getElementById("layer3").innerHTML;
+                    document.getElementById("layer3").innerHTML = document.getElementById("layer2").innerHTML;
+                    document.getElementById("layer2").innerHTML = temp;
+                    break;
+                case 2:
+                    temp = document.getElementById("layer4").innerHTML;
+                    document.getElementById("layer4").innerHTML = document.getElementById("layer3").innerHTML;
+                    document.getElementById("layer3").innerHTML = temp;
+                    break;
+            }
+        }
     });
 
     gl.enable(gl.DEPTH_TEST);
-
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(0.8, 0.8, 0.8, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
