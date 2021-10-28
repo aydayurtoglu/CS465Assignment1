@@ -256,21 +256,8 @@ window.onload = function init() {
                     color[i] = lineColor;
                 }
             }
-            // near
-            if (layerNo == 0)
-                layer = 0.2;
-
-            if (layerNo == 1)
-                layer = 0.4;
-
-            if (layerNo == 2)
-                layer = 0.6;
-            // far
-            if (layerNo == 3)
-                layer = 0.8;
-
-            console.log(layer);
             var radius = 0.04;
+            layer = layer - 0.00001;
         
             vertices = [
                 vec4(2*event.clientX/canvas.width-1,
@@ -377,6 +364,18 @@ window.onload = function init() {
     layers.addEventListener("click", function() {
         layerNo = layers.selectedIndex;
         layerchosen = true;
+        // near
+        if (layerNo == 0)
+            layer = 0.2;
+
+        if (layerNo == 1)
+            layer = 0.4;
+
+        if (layerNo == 2)
+            layer = 0.6;
+        // far
+        if (layerNo == 3)
+            layer = 0.8;
     });
 
     var upButton = document.getElementById("upButton");
