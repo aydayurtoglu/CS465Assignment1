@@ -251,13 +251,12 @@ window.onload = function init() {
             else
                 index += 8;
         }
-        /*
-        if(isShape && shapeNo == 0){   
+        if(isShape && shapeNo == 1){   
             if (isFilled)
-                index += 6;
+                index += count;
             else
-                index += 8;
-        }*/
+                index += count;
+        }
         else if (isShape && shapeNo == 2){
             if (isFilled)
                 index += 3;
@@ -690,7 +689,10 @@ function render() {
             }
             // shape is ellipse
             if (shapeNo == 1){
-
+                if (isFilled)
+                    gl.drawArrays(gl.LINES, start[i], numIndices[i]*count);
+                else if (!isFilled)
+                    gl.drawArrays(gl.LINES, start[i], numIndices[i]*count);
             }
             // shape is triangle
             if (shapeNo == 2){
