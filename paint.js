@@ -218,7 +218,6 @@ window.onload = function init() {
             return;
         }
         
-        
     });
    
     var save = document.getElementById("saveButton")
@@ -236,43 +235,10 @@ window.onload = function init() {
         undoNo = 0;
 
         //Drawing a rectangle
-        if (isShape && shapeNo == 0){
-            console.log("RECT");
-            
+        if (isShape){
             gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer)
             t1 = vec4(2*event.clientX/canvas.width-1, 
-                    2*(canvas.height-event.clientY)/canvas.height-1, layer, 1.0);
-            console.log(t1);
-            
-
-            console.log("rect" + index);
-        }
-        //Drawing an ellipse
-        else if (isShape && shapeNo == 1){
-            /*
-            console.log("ELLIPSE");
-            
-            gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer)
-                t1 = vec4(2*event.clientX/canvas.width-1, 
-                    2*(canvas.height-event.clientY)/canvas.height-1, layer, 1.0);
-                console.log(t1);
-            
-
-            console.log("ELLIPSE" + index);
-            */
-        }
-        //Drawing a triangle
-        else if (isShape && shapeNo == 2){
-            
-            console.log("TRIG");
-            
-            gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer)
-                t1 = vec4(2*event.clientX/canvas.width-1, 
-                    2*(canvas.height-event.clientY)/canvas.height-1, layer, 1.0);
-                console.log(t1);
-            
-
-            console.log("TRIG" + index);
+                2*(canvas.height-event.clientY)/canvas.height-1, layer, 1.0);        
         }
 
         numPolygons++;
@@ -284,11 +250,23 @@ window.onload = function init() {
         mouseClicked = false;
 
         if(isShape && shapeNo == 0){   
-            index += 6;
-
+            if (isFilled)
+                index += 6;
+            else
+                index += 8;
         }
+        /*
+        if(isShape && shapeNo == 0){   
+            if (isFilled)
+                index += 6;
+            else
+                index += 8;
+        }*/
         else if (isShape && shapeNo == 2){
-            index += 3;
+            if (isFilled)
+                index += 3;
+            else
+                index += 6;
         }
     });
   
@@ -358,8 +336,6 @@ window.onload = function init() {
         }
     });
 
-    
-
     canvas.addEventListener("mousemove", function drawShape(event) {
         if(mouseClicked && isShape){
             var color = new Array(6);
@@ -380,33 +356,40 @@ window.onload = function init() {
             }
 
             if (shapeNo == 0){
-                console.log("I AM INSIDE");
                 t2 = vec4(2*event.clientX/canvas.width-1, 
-                    2*(canvas.height-event.clientY)/canvas.height-1, layer, 1.0 ); //right bottom of triangle 1
-                console.log(t2);
-                t3 = vec4(t1[0], t2[1], layer, 1.0); //left bottom of triangle 1
-                t4 = vec4(t1[0], t1[1], layer, 1.0); //left top of triangle 2 (same as t1)
-                t5 = vec4(t2[0], t1[1], layer, 1.0); //right top of triangle 2
-                t6 = vec4(t2[0], t2[1], layer, 1.0); //right bottom of triangle 2 (same as t2)
-                console.log(t3);
-                console.log(t4);
+                    2*(canvas.height-event.clientY)/canvas.height-1, layer, 1.0 ); //right bottom
 
-                gl.bufferSubData(gl.ARRAY_BUFFER, 16*index, flatten(t1));
-                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+1), flatten(t3));
-                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+2), flatten(t2));
-                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+3), flatten(t6));
-                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+4), flatten(t4));
-                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+5), flatten(t5));
-                
-                gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer);
+                t3 = vec4(t1[0], t2[1], layer, 1.0); //left bottom 
+                t4 = vec4(t2[0], t1[1], layer, 1.0); //right top 
 
-                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index), flatten(color));
-                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+1), flatten(color));
-                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+2), flatten(color));
-                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+3), flatten(color));
-                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+4), flatten(color));
-                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+5), flatten(color));
+                if (isFilled) {
+                    gl.bufferSubData(gl.ARRAY_BUFFER, 16*index, flatten(t1));
+                    gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+1), flatten(t3));
+                    gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+2), flatten(t2));
+                    gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+3), flatten(t2));
+                    gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+4), flatten(t1));
+                    gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+5), flatten(t4));
+                    
+                    gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer);
 
+                    for (var i = 0; i < 6; i++)
+                    gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+i), flatten(color));
+                }
+                else {
+                    gl.bufferSubData(gl.ARRAY_BUFFER, 16*index, flatten(t1));
+                    gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+1), flatten(t3));
+                    gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+2), flatten(t3));
+                    gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+3), flatten(t2));
+                    gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+4), flatten(t2));
+                    gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+5), flatten(t4));
+                    gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+6), flatten(t4));
+                    gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+7), flatten(t1));
+                    
+                    gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer);
+
+                    for (var i = 0; i < 8; i++)
+                    gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+i), flatten(color));
+                }
                 numIndices[numPolygons]++;
             } 
             else if (shapeNo == 1){
@@ -414,29 +397,34 @@ window.onload = function init() {
                 
             }
             else if (shapeNo == 2){
-                console.log("I AM INSIDE TRIANGLE");
                 t2 = vec4(2*event.clientX/canvas.width-1, 
                     2*(canvas.height-event.clientY)/canvas.height-1, layer, 1.0 );
                 console.log(t2);
                 t3 = vec4(t1[0]-t2[0], t2[1], layer, 1.0);
-                //t4 = vec4(t2[0], t1[1], layer, 1.0);
-                console.log(t3);
-                //console.log(t4);
 
-                gl.bufferSubData(gl.ARRAY_BUFFER, 16*index, flatten(t1));
-                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+1), flatten(t3));
-                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+2), flatten(t2));
-                //gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+3), flatten(t4));
-                
-                gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer);
-                
-                //gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index-4), flatten(color));
-                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index), flatten(color));
-                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+1), flatten(color));
-                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+2), flatten(color));
-
+                if (isFilled){
+                    gl.bufferSubData(gl.ARRAY_BUFFER, 16*index, flatten(t1));
+                    gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+1), flatten(t3));
+                    gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+2), flatten(t2));
+                    
+                    gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer);
+                    for (var i = 0; i < 3; i++)
+                        gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+i), flatten(color));
+                }
+                else{
+                    gl.bufferSubData(gl.ARRAY_BUFFER, 16*index, flatten(t1));
+                    gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+1), flatten(t3));
+                    gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+2), flatten(t3));
+                    gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+3), flatten(t2));
+                    gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+4), flatten(t2));
+                    gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+5), flatten(t1));
+                    
+                    gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer);
+                    
+                    for (var i = 0; i < 6; i++)
+                        gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+i), flatten(color));
+                }
                 numIndices[numPolygons]++;
-                
             }
             layer = layer - 0.00001;
         }
@@ -583,7 +571,7 @@ function render() {
                 if (isFilled)
                     gl.drawArrays(gl.TRIANGLES, start[i], numIndices[i]*6);
                 else if (!isFilled)
-                    gl.drawArrays(gl.LINE_STRIP, start[i], numIndices[i]*6);
+                    gl.drawArrays(gl.LINE_STRIP, start[i], numIndices[i]*8);
             }
             if (shapeNo == 1){}
 
@@ -591,11 +579,10 @@ function render() {
                 if (isFilled)
                     gl.drawArrays(gl.TRIANGLES, start[i], numIndices[i]*3);
                 else if (!isFilled)
-                    gl.drawArrays(gl.LINE_STRIP, start[i], numIndices[i]*3);
+                    gl.drawArrays(gl.LINES, start[i], numIndices[i]*6);
             }
         }
     }
-
     
     requestAnimFrame(render);
 }
