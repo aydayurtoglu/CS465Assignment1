@@ -567,14 +567,18 @@ function render() {
         if (!isShape)
             gl.drawArrays(gl.TRIANGLE_STRIP, start[i], numIndices[i]*16);
         else {
+            // shape is rectangle
             if (shapeNo == 0) {
                 if (isFilled)
                     gl.drawArrays(gl.TRIANGLES, start[i], numIndices[i]*6);
                 else if (!isFilled)
-                    gl.drawArrays(gl.LINE_STRIP, start[i], numIndices[i]*8);
+                    gl.drawArrays(gl.LINES, start[i], numIndices[i]*8);
             }
-            if (shapeNo == 1){}
+            // shape is ellipse
+            if (shapeNo == 1){
 
+            }
+            // shape is triangle
             if (shapeNo == 2){
                 if (isFilled)
                     gl.drawArrays(gl.TRIANGLES, start[i], numIndices[i]*3);
