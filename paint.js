@@ -21,7 +21,8 @@ var colors = [
   vec4(0.0, 1.0, 1.0, 1.0), // cyan
   vec4(0.0, 0.0, 0.0, 0.0) // white
 ];
-var t;
+var t, t1, t2, t3, t4, t5, t6;
+var first = true;
 var numPolygons = 0;
 var numIndices = [];
 numIndices[0] = 0;
@@ -231,7 +232,47 @@ window.onload = function init() {
     canvas.addEventListener("mousedown", function draw(event){
         mouseClicked = true;
         undoNo = 0;
-        
+
+        //Drawing a rectangle
+        if (isShape && shapeNo == 0){
+            console.log("RECT");
+            
+            gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer)
+            t1 = vec4(2*event.clientX/canvas.width-1, 
+                    2*(canvas.height-event.clientY)/canvas.height-1, layer, 1.0);
+            console.log(t1);
+            
+
+            console.log("rect" + index);
+        }
+        //Drawing an ellipse
+        else if (isShape && shapeNo == 1){
+            /*
+            console.log("ELLIPSE");
+            
+            gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer)
+                t1 = vec4(2*event.clientX/canvas.width-1, 
+                    2*(canvas.height-event.clientY)/canvas.height-1, layer, 1.0);
+                console.log(t1);
+            
+
+            console.log("ELLIPSE" + index);
+            */
+        }
+        //Drawing a triangle
+        else if (isShape && shapeNo == 2){
+            
+            console.log("TRIG");
+            
+            gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer)
+                t1 = vec4(2*event.clientX/canvas.width-1, 
+                    2*(canvas.height-event.clientY)/canvas.height-1, layer, 1.0);
+                console.log(t1);
+            
+
+            console.log("TRIG" + index);
+        }
+
         numPolygons++;
         numIndices[numPolygons] = 0;
         start[numPolygons] = index;
@@ -239,6 +280,14 @@ window.onload = function init() {
   
     canvas.addEventListener("mouseup", function release(event){
         mouseClicked = false;
+
+        if(isShape && shapeNo == 0){   
+            index += 6;
+
+        }
+        else if (isShape && shapeNo == 2){
+            index += 3;
+        }
     });
   
     canvas.addEventListener("mousemove", function stroke(event) {
@@ -302,14 +351,16 @@ window.onload = function init() {
             gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
             gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(color));
 
-            index = index + 16;
+            index+=16;
             numIndices[numPolygons]++;
         }
     });
 
+    
+
     canvas.addEventListener("mousemove", function drawShape(event) {
         if(mouseClicked && isShape){
-            var color = new Array(4);
+            var color = new Array(6);
             
             gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
 
@@ -326,13 +377,68 @@ window.onload = function init() {
                 }
             }
 
-            if (shapeNo == 0){}
-            
-            if (shapeNo == 1){}
+            if (shapeNo == 0){
+                console.log("I AM INSIDE");
+                t2 = vec4(2*event.clientX/canvas.width-1, 
+                    2*(canvas.height-event.clientY)/canvas.height-1, layer, 1.0 ); //right bottom of triangle 1
+                console.log(t2);
+                t3 = vec4(t1[0], t2[1], layer, 1.0); //left bottom of triangle 1
+                t4 = vec4(t1[0], t1[1], layer, 1.0); //left top of triangle 2 (same as t1)
+                t5 = vec4(t2[0], t1[1], layer, 1.0); //right top of triangle 2
+                t6 = vec4(t2[0], t2[1], layer, 1.0); //right bottom of triangle 2 (same as t2)
+                console.log(t3);
+                console.log(t4);
 
-            if (shapeNo == 2){}
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*index, flatten(t1));
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+1), flatten(t3));
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+2), flatten(t2));
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+3), flatten(t6));
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+4), flatten(t4));
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+5), flatten(t5));
+                
+                gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer);
+
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index), flatten(color));
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+1), flatten(color));
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+2), flatten(color));
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+3), flatten(color));
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+4), flatten(color));
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+5), flatten(color));
+
+                numIndices[numPolygons]++;
+            } 
+            else if (shapeNo == 1){
+
+                
+            }
+            else if (shapeNo == 2){
+                console.log("I AM INSIDE TRIANGLE");
+                t2 = vec4(2*event.clientX/canvas.width-1, 
+                    2*(canvas.height-event.clientY)/canvas.height-1, layer, 1.0 );
+                console.log(t2);
+                t3 = vec4(t1[0]-t2[0], t2[1], layer, 1.0);
+                //t4 = vec4(t2[0], t1[1], layer, 1.0);
+                console.log(t3);
+                //console.log(t4);
+
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*index, flatten(t1));
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+1), flatten(t3));
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+2), flatten(t2));
+                //gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+3), flatten(t4));
+                
+                gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer);
+                
+                //gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index-4), flatten(color));
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index), flatten(color));
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+1), flatten(color));
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+2), flatten(color));
+
+                numIndices[numPolygons]++;
+                
+            }
         }
     });
+    
 
     var shapeList = document.getElementById("shapes");
     shapeList.addEventListener("click", function() {
@@ -470,15 +576,21 @@ function render() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     for (var i = 0; i <= numPolygons; i++) {
+
+        gl.drawArrays(gl.TRIANGLES, start[i], numIndices[i]*16);
+        /*
         if (!isShape)
             gl.drawArrays(gl.TRIANGLE_STRIP, start[i], numIndices[i]*16);
         else {
-            if (shapeNo == 0){}
-            //gl.drawArrays(gl.TRIANGLE_STRIP, start[i], numIndices[i]*4);
+            if (shapeNo == 0)
+                gl.drawArrays(gl.TRIANGLE_STRIP, start[i], numIndices[i]*4);
             if (shapeNo == 1){}
 
             if (shapeNo == 2){}
         }
+        */
     }
+
+    
     requestAnimFrame(render);
 }
