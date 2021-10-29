@@ -42,12 +42,8 @@ var shapeNo;
 var brush = true;
 var layerNo = 3;
 var layer = 0.8;
-
+var count;
 var isFilled = true;
-function colorChange(newValue)
-{
-    lineColor = newValue.color.rgb;
-}
 
 window.onload = function init() {
     canvas = document.getElementById("gl-canvas");
@@ -287,10 +283,11 @@ window.onload = function init() {
             }
             var radius = 0.04;
             layer = layer - 0.00001;
+
+            t = vec2(2*event.clientX/canvas.width-1, 2*(canvas.height-event.clientY)/canvas.height-1);
         
             vertices = [
-                vec4(2*event.clientX/canvas.width-1,
-                    (2*(canvas.height-event.clientY)/canvas.height-1)+radius, layer, 1.0),
+                vec4(t[0], t[1]+radius, layer, 1.0),
                 vec4((2*event.clientX/canvas.width-1)+radius,
                     2*(canvas.height-event.clientY)/canvas.height-1, layer, 1.0),
                 vec4((2*event.clientX/canvas.width-1)-radius,
@@ -393,7 +390,124 @@ window.onload = function init() {
                 numIndices[numPolygons]++;
             } 
             else if (shapeNo == 1){
+                
+                if (isFilled){
+                    t2 = vec4(2*event.clientX/canvas.width-1, 
+                        2*(canvas.height-event.clientY)/canvas.height-1, layer, 1.0 );
 
+                    var rSquare, r, centerX, centerY;
+
+                    rSquare = (t2[0] - t1[0]) ** 2 + (t2[1] - t1[1]) ** 2;
+                    r = Math.sqrt(rSquare);
+                    centerX = (t1[0] + t2[0]) / 2;
+                    centerY = (t1[1] + t2[1]) / 2;
+                    
+                    count = 0;
+
+                    // t2 > t1
+                    for (var x = t1[0]; x <= t2[0]; x += 0.05) {
+                        for (var y = t1[1]; y <= t2[1]; y += 0.05) {
+                            if ( ((x - centerX) ** 2) + ((y - centerY) ** 2) <= rSquare ) {
+                                t3 = vec4( x, y, layer, 1.0);
+                                //console.log(t3);
+                                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+count), flatten(t3));
+                                count++;
+                            }
+                        }
+                    }
+
+                    count = 0;
+                    gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer);
+
+                    for (var x = t1[0]; x <= t2[0]; x += 0.05) {
+                        for (var y = t1[1]; y <= t2[1]; y += 0.05) {
+                            if ( ((x - centerX) ** 2) + ((y - centerY) ** 2) <= rSquare ) {
+                                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+count), flatten(color));
+                                count++;
+                            }
+                        }
+                    }
+                    /*
+                    for (var x = t2[0]; x <= t1[0] + r; x += 0.001){
+                        for (var y = t2[1]; y <= t1[1] + r; y += 0.001) {
+                            if ( ((x - t1[0]) ** 2) + ((y - t1[1]) ** 2) == rSquare ) {
+                                t3 = vec4( x, y, layer, 1.0);
+                                console.log(t3);
+                                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+count), flatten(t3));
+                                count++;
+                                console.log(count)
+                            }
+                        }
+                    }
+                    for (var x = t2[0]; x < 1; x += 0.01){
+                        for (var y = t2[1]; y < -1; y -= 0.01) {
+                            if ( ((x - t1[0]) ** 2) + ((y - t1[1]) ** 2) == rSquare ) {
+                                t3 = vec4( x, y, layer, 1.0);
+                                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+count), flatten(t3));
+                                count++;
+                            }
+                        }
+                    }
+                    for (var x = t2[0]; x < -1; x -= 0.01){
+                        for (var y = t2[1]; y < -1; y -= 0.01) {
+                            if ( ((x - t1[0]) ** 2) + ((y - t1[1]) ** 2) == rSquare ) {
+                                t3 = vec4( x, y, layer, 1.0);
+                                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+count), flatten(t3));
+                                count++;
+                            }
+                        }
+                    }
+                    for (var x = t2[0]; x < -1; x -= 0.01){
+                        for (var y = t2[1]; y < 1; y += 0.01) {
+                            if ( ((x - t1[0]) ** 2) + ((y - t1[1]) ** 2) == rSquare ) {
+                                t3 = vec4( x, y, layer, 1.0);
+                                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+count), flatten(t3));
+                                count++;
+                            }
+                        }
+                    }
+                    console.log("count is " + count)
+                    count = 0;
+                    gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer);
+
+                    for (var x = t2[0]; x < 1; x++){
+                        for (var y = t2[1]; y < 1; y++) {
+                            if ( ((x - t1[0]) ** 2) + ((y - t1[1]) ** 2) == rSquare ) {
+                                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+count), flatten(color));
+                                count++;
+                            }
+                        }
+                    }
+                    for (var x = t2[0]; x < 1; x++){
+                        for (var y = t2[1]; y < -1; y--) {
+                            if ( ((x - t1[0]) ** 2) + ((y - t1[1]) ** 2) == rSquare ) {
+                                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+count), flatten(color));
+                                count++;
+                            }
+                        }
+                    }
+                    for (var x = t2[0]; x < -1; x--){
+                        for (var y = t2[1]; y < -1; y--) {
+                            if ( ((x - t1[0]) ** 2) + ((y - t1[1]) ** 2) == rSquare ) {
+                                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+count), flatten(color));
+                                count++;
+                            }
+                        }
+                    }
+                    for (var x = t2[0]; x < -1; x--){
+                        for (var y = t2[1]; y < 1; y++) {
+                            if ( ((x - t1[0]) ** 2) + ((y - t1[1]) ** 2) == rSquare ) {
+                                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+count), flatten(color));
+                                count++;
+                            }
+                        }
+                    }*/
+                }
+                else {
+
+
+                }
+                numIndices[numPolygons]++;
                 
             }
             else if (shapeNo == 2){
