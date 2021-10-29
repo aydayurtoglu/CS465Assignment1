@@ -470,6 +470,7 @@ window.onload = function init() {
     layers.addEventListener("click", function() {
         layerNo = layers.selectedIndex;
         layerchosen = true;
+        /*
         // near
         if (layerNo == 0)
             layer = 0.2;
@@ -481,7 +482,9 @@ window.onload = function init() {
             layer = 0.6;
         // far
         if (layerNo == 3)
-            layer = 0.8;
+            layer = 0.8;*/
+
+        layer = (2 ** layerNo) / 10.0;
     });
 
     var upButton = document.getElementById("upButton");
@@ -492,7 +495,7 @@ window.onload = function init() {
             switch(layerNo) {
                 case 1:
                     temp = document.getElementById("layer1").innerHTML;
-                    document.getElementById("layer1").innerHTML = document.getElementById("layer2").innerHTML ;
+                    document.getElementById("layer1").innerHTML = document.getElementById("layer2").innerHTML;
                     document.getElementById("layer2").innerHTML = temp;
                     break;
                 case 2:
