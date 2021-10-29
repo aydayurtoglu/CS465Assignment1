@@ -42,6 +42,8 @@ var shapeNo;
 var brush = true;
 var layerNo = 3;
 var layer = 0.8;
+
+var isFilled = true;
 function colorChange(newValue)
 {
     lineColor = newValue.color.rgb;
@@ -436,6 +438,7 @@ window.onload = function init() {
                 numIndices[numPolygons]++;
                 
             }
+            layer = layer - 0.00001;
         }
     });
     
@@ -444,6 +447,14 @@ window.onload = function init() {
     shapeList.addEventListener("click", function() {
         isShape = true;
         shapeNo = shapeList.selectedIndex;
+    });
+
+    var fillTypes = document.getElementById("filltype");
+    fillTypes.addEventListener("click", function() {
+        if (fillTypes.selectedIndex == 0)
+            isFilled = true;
+        else
+            isFilled = false;
     });
 
     var brushButton = document.getElementById("brushButton");
@@ -470,20 +481,6 @@ window.onload = function init() {
     layers.addEventListener("click", function() {
         layerNo = layers.selectedIndex;
         layerchosen = true;
-        /*
-        // near
-        if (layerNo == 0)
-            layer = 0.2;
-
-        if (layerNo == 1)
-            layer = 0.4;
-
-        if (layerNo == 2)
-            layer = 0.6;
-        // far
-        if (layerNo == 3)
-            layer = 0.8;*/
-
         layer = (2 ** layerNo) / 10.0;
     });
 
@@ -579,19 +576,24 @@ function render() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     for (var i = 0; i <= numPolygons; i++) {
-
-        gl.drawArrays(gl.TRIANGLES, start[i], numIndices[i]*16);
-        /*
         if (!isShape)
             gl.drawArrays(gl.TRIANGLE_STRIP, start[i], numIndices[i]*16);
         else {
-            if (shapeNo == 0)
-                gl.drawArrays(gl.TRIANGLE_STRIP, start[i], numIndices[i]*4);
+            if (shapeNo == 0) {
+                if (isFilled)
+                    gl.drawArrays(gl.TRIANGLES, start[i], numIndices[i]*6);
+                else if (!isFilled)
+                    gl.drawArrays(gl.LINE_STRIP, start[i], numIndices[i]*6);
+            }
             if (shapeNo == 1){}
 
-            if (shapeNo == 2){}
+            if (shapeNo == 2){
+                if (isFilled)
+                    gl.drawArrays(gl.TRIANGLES, start[i], numIndices[i]*3);
+                else if (!isFilled)
+                    gl.drawArrays(gl.LINE_STRIP, start[i], numIndices[i]*3);
+            }
         }
-        */
     }
 
     
