@@ -1,5 +1,6 @@
 <html>
   <link rel="stylesheet" href="painting.css">
+  <script src="https://kit.fontawesome.com/e8ab680734.js" crossorigin="anonymous"></script>
 <script id="vertex-shader" type="x-shader/x-vertex">
   attribute vec4 vPosition; 
   attribute vec4 vColor; 
@@ -9,7 +10,6 @@
     fColor = vColor;
   }
 </script>
-
 <script id="fragment-shader" type="x-shader/x-fragment">
 
   precision mediump float; varying vec4 fColor; 
@@ -57,18 +57,16 @@
   </div>
 
   <div>
-    <div>
-      <button id="saveButton">Save</button>
-      <button id="loadButton">Load</button>
-    </div>
-    <div>
-      <button id="brushButton">Brush</button>
-      <button id="eraserButton">Eraser</button>
-    </div>
-    <div>
-      <button id="clearButton">Clear</button>
-      <button id="undoButton">Undo</button>
-      <button id="redoButton">Redo</button>
+    <div class="buttons">
+      <button id="brushButton" class="button"><i class="fa fa-paint-brush fa-2x"></i></button>
+      <button id="eraserButton" class="button"><i class="fas fa-eraser fa-2x"></i></button>
+      <div class="buttons1">
+        <button id="saveButton" class="button"><i class="fas fa-save fa-2x"></i></button>
+        <button id="loadButton" class="button"><i class="fas fa-upload fa-2x"></i></button>
+        <button id="clearButton" class="button"><i class="fas fa-trash fa-2x"></i></button>
+        <button id="undoButton" class="button"><i class="fas fa-undo fa-2x"></i></button>
+        <button id="redoButton" class="button"><i class="fas fa-redo fa-2x"></i></button>
+      </div>
     </div>
     <div class="menus">
       <select class="layers" id="layers" size="4 ">

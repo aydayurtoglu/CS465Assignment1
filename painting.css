@@ -33,4 +33,19 @@ body {
 .menus {
     display: flex;
     flex-direction: row;
+    margin: 10px;
+}
+
+.button { 
+    border-radius: 15px;
+    padding: 10px;
+}
+.buttons {
+    display: flex;
+    flex-direction: row;
+    margin: 10px;
+}
+
+.buttons1 {
+    padding-left: 100px;
 }
