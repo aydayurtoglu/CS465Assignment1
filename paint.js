@@ -49,14 +49,18 @@ var layerNo = 3;
 var layer = 0.8;
 var count;
 var isFilled = true;
+var content = [];
+var options;
 
 window.onload = function init() {
-    canvas = document.getElementById("gl-canvas");
+    localStorage.clear();
 
+    canvas = document.getElementById("gl-canvas");
+    options = document.getElementById("storage");
     // visual color picker
     vcp = document.getElementById("colorpicker");
     var ctx = vcp.getContext("2d");
-    
+
     /*
         This function was taken from https://stackoverflow.com/questions/41524641/draw-saturation-brightness-gradient
         It converts RGB values to HSL values.
@@ -229,12 +233,41 @@ window.onload = function init() {
    
     var save = document.getElementById("saveButton")
     save.addEventListener("click", function save(){
-        capture = true;
+        // capture = true;
+
+        if(!document.getElementById("saveName").value)
+        {
+            alert("Please enter file name!");
+            return;
+        }
+
+        var fileName = document.getElementById("saveName").value;
+        localStorage.setItem(fileName, JSON.stringify(content));
+        loadFileNames();
     });
     
     var load = document.getElementById("loadButton")
     load.addEventListener("click", function save(){
         loadCanvas = true;
+
+        if(options.selectedIndex == -1)
+        {
+            alert("No saved file!");
+            return;
+        }
+
+        var fileName = options[options.selectedIndex].text;
+        var result = localStorage.getItem(fileName);
+
+        if(!result)
+        {
+            alert("No result found for '" + fileName + "'");
+        }
+        else
+        {
+            result = JSON.parse(result);
+            generatePoints(result);
+        }    
     });
 
     canvas.addEventListener("mousedown", function draw(event){
@@ -345,6 +378,9 @@ window.onload = function init() {
             //console.log(vertices.length);
             //console.log(deletedVertices.length);
             colorCpy = colorCpy.concat(color);
+
+            content.push(vertices);
+            content.push(color);
 
             gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
             gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(vertices));
@@ -462,7 +498,6 @@ window.onload = function init() {
             else if (shapeNo == 2){
                 t2 = vec4(2*event.clientX/canvas.width-1, 
                     2*(canvas.height-event.clientY)/canvas.height-1, layer, 1.0 );
-                console.log(t2);
                 t3 = vec4(t1[0]-t2[0], t2[1], layer, 1.0);
 
                 if (isFilled){
@@ -617,6 +652,23 @@ window.onload = function init() {
         }
     });
 
+    function loadFileNames()
+    {
+        options.innerHTML = "";
+        for(var i = 0; i < Object.keys(localStorage).length; i++)
+        {
+            var option = document.createElement("option");
+            option.value = i;
+            option.innerHTML = Object.keys(localStorage)[i];
+            options.appendChild(option);
+        }
+    }
+
+    function generatePoints()
+    {
+
+    }
+
     gl.enable(gl.DEPTH_TEST);
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(0.8, 0.8, 0.8, 1.0);
@@ -647,12 +699,36 @@ window.onload = function init() {
     render();
 }
 
+function downloadFile(array, size, fileNamePtr) {
+    var fileName = UTF8ToString(fileNamePtr);
+ 
+    var bytes = new Uint8Array(size);
+    for (var i = 0; i < size; i++)
+    {
+       bytes[i] = HEAPU8[array + i];
+    }
+ 
+    var blob = new Blob([bytes]);
+    var link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.download = fileName;
+ 
+    var event = document.createEvent("MouseEvents");
+    event.initMouseEvent("click");
+    link.dispatchEvent(event);
+    window.URL.revokeObjectURL(link.href);
+}
+
 function render() {
     if (capture) {
         capture = false;
 
         var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
         window.location.href=image;
+
+       // downloadFile(vertices, numIndices, "ayda.png");
+
+       
     }
 
     if (loadCanvas) {
@@ -662,6 +738,8 @@ function render() {
             
         formData.append("photo", photo);
         fetch('/upload/image', {method: "POST", body: formData});
+
+        //gl.()
     }
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);

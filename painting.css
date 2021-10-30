@@ -33,24 +33,21 @@ body {
 .menus {
     display: flex;
     flex-direction: row;
-    margin: 10px;
+    margin: 6px;
 }
 
 .button { 
     border-radius: 15px;
     padding: 10px;
+    margin-left: 3px;
+    margin-right: 3px;
+    width: 50px;
 }
-
-.buttonUpload { 
-    border-radius: 15px;
-    height: 50px;
-    width: 200px;
-    padding: 7px;
-}
-
 .buttons {
     display: flex;
     flex-direction: row;
-    margin: 10px;
+    margin: 5px;
 }
-
+.form {
+    width: 120px
+}
