@@ -694,6 +694,7 @@ window.onload = function init() {
 
         var vertexNo = value[value.length-1];
         
+        var count = 0;
         for(var i = value.length-2; i > value.length-2-vertexNo; i--){
             gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
             gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(value[i]));
@@ -701,9 +702,11 @@ window.onload = function init() {
             gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
             gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(colors[0]));  
 
-            index += 16;
+            index += 24;
             numIndices[numPolygons]++;
+            count++;
         }
+        console.log(count)
     }
 
     gl.enable(gl.DEPTH_TEST);
