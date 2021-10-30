@@ -327,7 +327,7 @@ window.onload = function init() {
   
     canvas.addEventListener("mousemove", function stroke(event) {
         if(mouseClicked && !isShape && brush){
-            var color = new Array(16);
+            var color = new Array(24);
             if (!colorPicker){
                 for (var i = 0; i < color.length ; i++) 
                 {
@@ -351,6 +351,10 @@ window.onload = function init() {
                     2*(canvas.height-event.clientY)/canvas.height-1, layer, 1.0),
                 vec4((2*event.clientX/canvas.width-1)-radius,
                     2*(canvas.height-event.clientY)/canvas.height-1, layer, 1.0),
+                vec4((2*event.clientX/canvas.width-1)+radius,
+                    2*(canvas.height-event.clientY)/canvas.height-1, layer, 1.0),
+                vec4((2*event.clientX/canvas.width-1)-radius,
+                    2*(canvas.height-event.clientY)/canvas.height-1, layer, 1.0),
                 vec4((2*event.clientX/canvas.width-1),
                      (2*(canvas.height-event.clientY)/canvas.height-1)-radius, layer, 1.0),
                 
@@ -360,6 +364,10 @@ window.onload = function init() {
                      (2*(canvas.height-event.clientY)/canvas.height-1)-radius*Math.sqrt(2)/2, layer, 1.0),
                 vec4((2*event.clientX/canvas.width-1)-radius*Math.sqrt(2)/2,
                     (2*(canvas.height-event.clientY)/canvas.height-1)+radius*Math.sqrt(2)/2, layer, 1.0),
+                vec4((2*event.clientX/canvas.width-1)+radius*Math.sqrt(2)/2,
+                    (2*(canvas.height-event.clientY)/canvas.height-1)-radius*Math.sqrt(2)/2, layer, 1.0),
+                vec4((2*event.clientX/canvas.width-1)-radius*Math.sqrt(2)/2,
+                   (2*(canvas.height-event.clientY)/canvas.height-1)+radius*Math.sqrt(2)/2, layer, 1.0),
                 vec4((2*event.clientX/canvas.width-1)-radius*Math.sqrt(2)/2,
                      (2*(canvas.height-event.clientY)/canvas.height-1)-radius*Math.sqrt(2)/2, layer, 1.0),
                 
@@ -369,6 +377,10 @@ window.onload = function init() {
                      (2*(canvas.height-event.clientY)/canvas.height-1)-radius/2, layer, 1.0),
                 vec4((2*event.clientX/canvas.width-1)-radius/2,
                     (2*(canvas.height-event.clientY)/canvas.height-1)+radius*Math.sqrt(3)/2, layer, 1.0),
+                vec4((2*event.clientX/canvas.width-1)+radius*Math.sqrt(3)/2,
+                    (2*(canvas.height-event.clientY)/canvas.height-1)-radius/2, layer, 1.0),
+                vec4((2*event.clientX/canvas.width-1)-radius/2,
+                   (2*(canvas.height-event.clientY)/canvas.height-1)+radius*Math.sqrt(3)/2, layer, 1.0),
                 vec4((2*event.clientX/canvas.width-1)-radius/2,
                      (2*(canvas.height-event.clientY)/canvas.height-1)-radius*Math.sqrt(3)/2, layer, 1.0),
 
@@ -378,6 +390,10 @@ window.onload = function init() {
                      (2*(canvas.height-event.clientY)/canvas.height-1)-radius*Math.sqrt(3)/2, layer, 1.0),
                 vec4((2*event.clientX/canvas.width-1)-radius*Math.sqrt(3)/2,
                     (2*(canvas.height-event.clientY)/canvas.height-1)+radius/2, layer, 1.0),
+                vec4((2*event.clientX/canvas.width-1)+radius/2,
+                    (2*(canvas.height-event.clientY)/canvas.height-1)-radius*Math.sqrt(3)/2, layer, 1.0),
+                vec4((2*event.clientX/canvas.width-1)-radius*Math.sqrt(3)/2,
+                   (2*(canvas.height-event.clientY)/canvas.height-1)+radius/2, layer, 1.0),
                 vec4((2*event.clientX/canvas.width-1)-radius*Math.sqrt(3)/2,
                     (2*(canvas.height-event.clientY)/canvas.height-1)-radius/2, layer, 1.0),
             ]
@@ -397,7 +413,7 @@ window.onload = function init() {
             gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
             gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(color));
 
-            index+=16;
+            index += 24;
             //strokeIndex+=16;
             numIndices[numPolygons]++;
         }
@@ -573,16 +589,16 @@ window.onload = function init() {
             t = vec2(2*event.clientX/canvas.width-1, 2*(canvas.height-event.clientY)/canvas.height-1);
 
             for (var i = 0; i < numStrokes; i++){
-                console.log("GIRDIM");
+                //console.log("GIRDIM");
                 for (var j = startStrokes[i]; j < finishStrokes[i]; j+=16){
-                    console.log(deletedVertices[j]);
-                    console.log(finishStrokes[i]);
-                    console.log(j);
+                    //console.log(deletedVertices[j]);
+                    //console.log(finishStrokes[i]);
+                   // console.log(j);
                     //console.log(deletedVertices[j][1]);
 
-                    var distance = Math.sqrt( Math.pow(deletedVertices[j][0]-t[0], 2)+ Math.pow(deletedVertices[j][1]-t[1], 2) );
+                    var distance = Math.sqrt( Math.pow(deletedVertices[j][0]-t[0], 2)+ Math.pow(deletedVertices[j][1]-t[1], 2));
                     if (distance < radius){
-                        console.log("GIRDIM3");
+                        //console.log("GIRDIM3");
                         deletedVertices.splice(j, 16);
                         colorCpy.splice(j, 16);
                         j-=16;
@@ -590,17 +606,13 @@ window.onload = function init() {
                         index-=16;
                         numIndices[numPolygons]--;
                     }
-
                 }
-                
             }
 
             gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
             gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(deletedVertices));
             gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
             gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(colorCpy));
-            
-            
         }
     });
 
@@ -755,10 +767,9 @@ function render() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     for (var i = 0; i <= numPolygons; i++) {
-        //gl.drawArrays(gl.TRIANGLES, start[i], numIndices[i]*16);
         
         if (!isShape)
-            gl.drawArrays(gl.TRIANGLES, start[i], numIndices[i]*16);
+            gl.drawArrays(gl.TRIANGLES, start[i], numIndices[i]*24);
         else {
             // shape is rectangle
             if (shapeNo == 0) {
