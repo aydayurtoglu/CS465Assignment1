@@ -590,7 +590,7 @@ window.onload = function init() {
 
             for (var i = 0; i < numStrokes; i++){
                 //console.log("GIRDIM");
-                for (var j = startStrokes[i]; j < finishStrokes[i]; j+=16){
+                for (var j = startStrokes[i]; j < finishStrokes[i]; j+=24){
                     //console.log(deletedVertices[j]);
                     //console.log(finishStrokes[i]);
                    // console.log(j);
@@ -599,11 +599,11 @@ window.onload = function init() {
                     var distance = Math.sqrt( Math.pow(deletedVertices[j][0]-t[0], 2)+ Math.pow(deletedVertices[j][1]-t[1], 2));
                     if (distance < radius){
                         //console.log("GIRDIM3");
-                        deletedVertices.splice(j, 16);
-                        colorCpy.splice(j, 16);
-                        j-=16;
-                        finishStrokes[i]-=16;
-                        index-=16;
+                        deletedVertices.splice(j, 24);
+                        colorCpy.splice(j, 24);
+                        j-=24;
+                        finishStrokes[i]-=24;
+                        index-=24;
                         numIndices[numPolygons]--;
                     }
                 }
