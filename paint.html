@@ -1,5 +1,9 @@
 <html>
-  <link rel="stylesheet" href="painting.css">
+  <head>
+    <meta charset="utf-8">
+    <title>2D Paint Application</title>
+    <link rel="stylesheet" href="painting.css">
+</head>
   <script src="https://kit.fontawesome.com/e8ab680734.js" crossorigin="anonymous"></script>
 <script id="vertex-shader" type="x-shader/x-vertex">
   attribute vec4 vPosition; 
@@ -58,14 +62,17 @@
 
   <div>
     <div class="buttons">
-      <button id="saveButton" class="button"><i class="fas fa-save fa-2x"></i></button>
-      <button id="loadButton" class="buttonUpload"><input id="canvas-file" type="file" /></button>
       <button id="brushButton" class="button"><i class="fa fa-paint-brush fa-2x"></i></button>
       <button id="eraserButton" class="button"><i class="fas fa-eraser fa-2x"></i></button>
       <button id="clearButton" class="button"><i class="fas fa-trash fa-2x"></i></button>
       <button id="undoButton" class="button"><i class="fas fa-undo fa-2x"></i></button>
       <button id="redoButton" class="button"><i class="fas fa-redo fa-2x"></i></button>
-      
+    </div>
+    <div class="buttons">
+      <button id="saveButton" class="button"><i class="fas fa-save fa-2x"></i></button>
+      <input type="text" id="saveName" class="form" placeholder="Enter file name">
+      <button id="loadButton" class="button"><i class="fas fa-file-upload fa-2x"></i></button>
+      <select id="storage" class="form"></select>
     </div>
     <div class="menus">
       <select class="layers" id="layers" size="4 ">
