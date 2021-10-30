@@ -604,6 +604,15 @@ function render() {
         window.location.href=image;
     }
 
+    if (loadCanvas) {
+        loadCanvas = false;
+        let photo = document.getElementById("canvas-file").files[0];
+        let formData = new FormData();
+            
+        formData.append("photo", photo);
+        fetch('/upload/image', {method: "POST", body: formData});
+    }
+
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     for (var i = 0; i <= numPolygons; i++) {
