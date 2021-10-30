@@ -34,7 +34,7 @@ var undoNo = 0;
 var mouseClicked = false;
 var capture = false;
 var loadCanvas = false;
-var lineColor = vec4(0.0, 1.0, 1.0, 1.0);
+var lineColor;
 var colorPicker = false;
 
 var isShape = false;
@@ -44,8 +44,10 @@ var layerNo = 3;
 var layer = 0.8;
 var count;
 var isFilled = true;
-var content = [];
+var points = [];
+var subPoints = [];
 var options;
+var fileSize;
 
 window.onload = function init() {
     localStorage.clear();
@@ -186,15 +188,19 @@ window.onload = function init() {
         drawGradient(colors[cindex][0], colors[cindex][1], colors[cindex][2]);
     });
 
-    var c = document.getElementById("clearButton")
-    c.addEventListener("click", function(){
+    var clearButton = document.getElementById("clearButton")
+    clearButton.addEventListener("click", function (){
+        clearCanvas();
+    });
+
+    function clearCanvas(){
         index = 0;
         numPolygons = 0;
         numIndices = [];
         numIndices[0] = 0;
         start = [0];
-    });
-
+        subPoints = [];
+    }
     var undo = document.getElementById("undoButton")
     undo.addEventListener("click", function undo(){
         
@@ -229,6 +235,8 @@ window.onload = function init() {
     var save = document.getElementById("saveButton")
     save.addEventListener("click", function save(){
         // capture = true;
+        fileSize = subPoints.length;
+        points.push(fileSize);
 
         if(!document.getElementById("saveName").value)
         {
@@ -237,7 +245,7 @@ window.onload = function init() {
         }
 
         var fileName = document.getElementById("saveName").value;
-        localStorage.setItem(fileName, JSON.stringify(content));
+        localStorage.setItem(fileName, JSON.stringify(points));
         loadFileNames();
     });
     
@@ -361,8 +369,10 @@ window.onload = function init() {
                      (2*(canvas.height-event.clientY)/canvas.height-1)-radius/2, layer, 1.0),
             ]
 
-            content.push(vertices);
-            content.push(color);
+           // points.push(index);
+            points.push(vertices);
+            subPoints.push(vertices);
+           // points.push(color);
 
             gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
             gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(vertices));
@@ -613,9 +623,24 @@ window.onload = function init() {
         }
     }
 
-    function generatePoints()
+    function generatePoints(value)
     {
+        clearCanvas();
 
+        console.log(value);
+
+        var vertexNo = value[value.length-1];
+        
+        for(var i = value.length-2; i > value.length-2-vertexNo; i--){
+            gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+            gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(value[i]));
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
+            gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(colors[0]));  
+
+            index += 16;
+            numIndices[numPolygons]++;
+        }
     }
 
     gl.enable(gl.DEPTH_TEST);
@@ -674,21 +699,6 @@ function render() {
 
         var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
         window.location.href=image;
-
-       // downloadFile(vertices, numIndices, "ayda.png");
-
-       
-    }
-
-    if (loadCanvas) {
-        loadCanvas = false;
-        let photo = document.getElementById("canvas-file").files[0];
-        let formData = new FormData();
-            
-        formData.append("photo", photo);
-        fetch('/upload/image', {method: "POST", body: formData});
-
-        //gl.()
     }
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
