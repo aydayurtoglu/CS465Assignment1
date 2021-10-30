@@ -42,6 +42,7 @@ var loadCanvas = false;
 var lineColor;
 var colorPicker = false;
 
+var selectRegion = false;
 var isShape = false;
 var shapeNo;
 var brush = true;
@@ -538,6 +539,73 @@ window.onload = function init() {
         }
     });
     
+    canvas.addEventListener("mousemove", function rectangularSelect(event) {
+        if(mouseClicked && isShape){
+            var color = new Array(6);
+            
+            gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+
+            if (!colorPicker){
+                for (var i = 0; i < color.length ; i++) 
+                {
+                    color[i] = vec4(colors[cindex]);
+                }
+            }
+            else {
+                for (var i = 0; i < color.length ; i++) 
+                {
+                    color[i] = lineColor;
+                }
+            }
+
+            
+            t2 = vec4(2*event.clientX/canvas.width-1, 
+                2*(canvas.height-event.clientY)/canvas.height-1, layer, 1.0 ); //right bottom
+
+            t3 = vec4(t1[0], t2[1], layer, 1.0); //left bottom 
+            t4 = vec4(t2[0], t1[1], layer, 1.0); //right top 
+
+            if (isFilled) {
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*index, flatten(t1));
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+1), flatten(t3));
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+2), flatten(t2));
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+3), flatten(t2));
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+4), flatten(t1));
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+5), flatten(t4));
+                
+                gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer);
+
+                for (var i = 0; i < 6; i++)
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+i), flatten(color));
+            }
+            else {
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*index, flatten(t1));
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+1), flatten(t3));
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+2), flatten(t3));
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+3), flatten(t2));
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+4), flatten(t2));
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+5), flatten(t4));
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+6), flatten(t4));
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+7), flatten(t1));
+                
+                gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer);
+
+                for (var i = 0; i < 8; i++)
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+i), flatten(color));
+            }
+            numIndices[numPolygons]++;
+            
+            
+        }
+    });
+
+    var rectangularSelect = document.getElementById("rectangularSelectButton");
+    rectangularSelect.addEventListener("click", function selectARegion() {
+        selectRegion = true;
+        isShape = false;
+        isBrush = false;
+    });
+
 
     var shapeList = document.getElementById("shapes");
     shapeList.addEventListener("click", function() {
