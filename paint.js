@@ -658,7 +658,7 @@ window.onload = function init() {
 
             for (var i = 0; i < numStrokes; i++){
                 //console.log("GIRDIM");
-                for (var j = startStrokes[i]; j < finishStrokes[i]; j+=16){
+                for (var j = startStrokes[i]; j < finishStrokes[i]; j+=3){
                     //console.log(deletedVertices[j]);
                     //console.log(finishStrokes[i]);
                    // console.log(j);
@@ -667,11 +667,11 @@ window.onload = function init() {
                     var distance = Math.sqrt( Math.pow(deletedVertices[j][0]-t[0], 2)+ Math.pow(deletedVertices[j][1]-t[1], 2));
                     if (distance < radius){
                         //console.log("GIRDIM3");
-                        deletedVertices.splice(j, 16);
-                        colorCpy.splice(j, 16);
-                        j-=16;
-                        finishStrokes[i]-=16;
-                        index-=16;
+                        deletedVertices.splice(j, 3);
+                        colorCpy.splice(j, 3);
+                        j-=3;
+                        finishStrokes[i]-=3;
+                        index-=3;
                         numIndices[numPolygons]--;
                     }
                 }
@@ -842,9 +842,9 @@ function render() {
             // shape is rectangle
             if (shapeNo == 0) {
                 if (isFilled)
-                    gl.drawArrays(gl.TRIANGLES, start[i], numIndices[i]*16);
+                    gl.drawArrays(gl.TRIANGLES, start[i], numIndices[i]*24);
                 else if (!isFilled)
-                    gl.drawArrays(gl.LINES, start[i], numIndices[i]*16);
+                    gl.drawArrays(gl.LINES, start[i], numIndices[i]*24);
             }
             // shape is ellipse
             if (shapeNo == 1){
