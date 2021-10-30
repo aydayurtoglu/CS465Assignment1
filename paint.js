@@ -52,28 +52,11 @@ window.onload = function init() {
     vcp = document.getElementById("colorpicker");
     var ctx = vcp.getContext("2d");
     
-    vcp.width = 255;
-    vcp.height = 255;
-    
-
-    function drawGradient(r, g, b) {
-        var col = rgbToLSH(r, g, b);
-        var gradB = ctx.createLinearGradient(0, 0, 0, 255);
-        gradB.addColorStop(0, "white");
-        gradB.addColorStop(1, "black");
-        var gradC = ctx.createLinearGradient(0, 0, 255, 0);
-        gradC.addColorStop(0, `hsla(${Math.floor(col.hue)},100%,50%,0)`);
-        gradC.addColorStop(1, `hsla(${Math.floor(col.hue)},100%,50%,1)`);
-
-        ctx.fillStyle = gradB;
-        ctx.fillRect(0, 0, 255, 255);
-        ctx.fillStyle = gradC;
-        ctx.globalCompositeOperation = "multiply";
-        ctx.fillRect(0, 0, 255, 255);
-        ctx.globalCompositeOperation = "source-over";
-    }
-
-    function rgbToLSH(red, green, blue, result = {}) {
+    /*
+        This function was taken from https://stackoverflow.com/questions/41524641/draw-saturation-brightness-gradient
+        It converts RGB values to HSL values.
+    */
+    function rgbToHSL(red, green, blue, result = {}) {
         var hue, sat, lum, min, max, dif, r, g, b;
         r = red / 255;
         g = green / 255;
@@ -107,6 +90,27 @@ window.onload = function init() {
         result.sat = sat * 255;
         result.hue = hue;
         return result;
+    }
+
+    /*
+        This function was taken from https://stackoverflow.com/questions/41524641/draw-saturation-brightness-gradient
+        It draws a gradient on the visual color picker by taking the rgb value from the hue picker.
+    */
+    function drawGradient(r, g, b) {
+        var col = rgbToHSL(r, g, b);
+        var gradB = ctx.createLinearGradient(0, 0, 0, 255);
+        gradB.addColorStop(0, "white");
+        gradB.addColorStop(1, "black");
+        var gradC = ctx.createLinearGradient(0, 0, 255, 0);
+        gradC.addColorStop(0, `hsla(${Math.floor(col.hue)},100%,50%,0)`);
+        gradC.addColorStop(1, `hsla(${Math.floor(col.hue)},100%,50%,1)`);
+
+        ctx.fillStyle = gradB;
+        ctx.fillRect(0, 0, 255, 255);
+        ctx.fillStyle = gradC;
+        ctx.globalCompositeOperation = "multiply";
+        ctx.fillRect(0, 0, 255, 255);
+        ctx.globalCompositeOperation = "source-over";
     }
 
     // Display hue.png on a canvas
@@ -191,7 +195,7 @@ window.onload = function init() {
         if (undoNo == 10)
             return;
 
-        else {//mark noOfIndices and starting indexes of undone stroke
+        else { //mark noOfIndices and starting indexes of undone stroke
             undoIndices[undoNo] = numIndices[numPolygons];
             numIndices[numPolygons] = 0;
             //increase undoNo and decrease numPolygons
@@ -285,7 +289,7 @@ window.onload = function init() {
 
             t = vec2(2*event.clientX/canvas.width-1, 2*(canvas.height-event.clientY)/canvas.height-1);
         
-            vertices = [
+            vertices = [ // draw four squares on top of each other with different angles to create a round brush
                 vec4(t[0], t[1]+radius, layer, 1.0),
                 vec4((2*event.clientX/canvas.width-1)+radius,
                     2*(canvas.height-event.clientY)/canvas.height-1, layer, 1.0),
@@ -426,81 +430,6 @@ window.onload = function init() {
                             }
                         }
                     }
-                    /*
-                    for (var x = t2[0]; x <= t1[0] + r; x += 0.001){
-                        for (var y = t2[1]; y <= t1[1] + r; y += 0.001) {
-                            if ( ((x - t1[0]) ** 2) + ((y - t1[1]) ** 2) == rSquare ) {
-                                t3 = vec4( x, y, layer, 1.0);
-                                console.log(t3);
-                                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+count), flatten(t3));
-                                count++;
-                                console.log(count)
-                            }
-                        }
-                    }
-                    for (var x = t2[0]; x < 1; x += 0.01){
-                        for (var y = t2[1]; y < -1; y -= 0.01) {
-                            if ( ((x - t1[0]) ** 2) + ((y - t1[1]) ** 2) == rSquare ) {
-                                t3 = vec4( x, y, layer, 1.0);
-                                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+count), flatten(t3));
-                                count++;
-                            }
-                        }
-                    }
-                    for (var x = t2[0]; x < -1; x -= 0.01){
-                        for (var y = t2[1]; y < -1; y -= 0.01) {
-                            if ( ((x - t1[0]) ** 2) + ((y - t1[1]) ** 2) == rSquare ) {
-                                t3 = vec4( x, y, layer, 1.0);
-                                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+count), flatten(t3));
-                                count++;
-                            }
-                        }
-                    }
-                    for (var x = t2[0]; x < -1; x -= 0.01){
-                        for (var y = t2[1]; y < 1; y += 0.01) {
-                            if ( ((x - t1[0]) ** 2) + ((y - t1[1]) ** 2) == rSquare ) {
-                                t3 = vec4( x, y, layer, 1.0);
-                                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+count), flatten(t3));
-                                count++;
-                            }
-                        }
-                    }
-                    console.log("count is " + count)
-                    count = 0;
-                    gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer);
-
-                    for (var x = t2[0]; x < 1; x++){
-                        for (var y = t2[1]; y < 1; y++) {
-                            if ( ((x - t1[0]) ** 2) + ((y - t1[1]) ** 2) == rSquare ) {
-                                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+count), flatten(color));
-                                count++;
-                            }
-                        }
-                    }
-                    for (var x = t2[0]; x < 1; x++){
-                        for (var y = t2[1]; y < -1; y--) {
-                            if ( ((x - t1[0]) ** 2) + ((y - t1[1]) ** 2) == rSquare ) {
-                                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+count), flatten(color));
-                                count++;
-                            }
-                        }
-                    }
-                    for (var x = t2[0]; x < -1; x--){
-                        for (var y = t2[1]; y < -1; y--) {
-                            if ( ((x - t1[0]) ** 2) + ((y - t1[1]) ** 2) == rSquare ) {
-                                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+count), flatten(color));
-                                count++;
-                            }
-                        }
-                    }
-                    for (var x = t2[0]; x < -1; x--){
-                        for (var y = t2[1]; y < 1; y++) {
-                            if ( ((x - t1[0]) ** 2) + ((y - t1[1]) ** 2) == rSquare ) {
-                                gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+count), flatten(color));
-                                count++;
-                            }
-                        }
-                    }*/
                 }
                 else {
 
@@ -645,7 +574,6 @@ window.onload = function init() {
     //
     var program = initShaders(gl, "vertex-shader", "fragment-shader");
     gl.useProgram(program);
-
 
     var cBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
