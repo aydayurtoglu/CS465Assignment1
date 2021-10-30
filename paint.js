@@ -16,9 +16,9 @@ var colors = [
   vec4(1.0, 0.0, 0.0, 1.0), // red
   vec4(1.0, 1.0, 0.0, 1.0), // yellow
   vec4(0.0, 1.0, 0.0, 1.0), // green
+  vec4(0.0, 1.0, 1.0, 1.0), // cyan
   vec4(0.0, 0.0, 1.0, 1.0), // blue
   vec4(1.0, 0.0, 1.0, 1.0), // magenta
-  vec4(0.0, 1.0, 1.0, 1.0), // cyan
   vec4(0.0, 0.0, 0.0, 0.0) // white
 ];
 var t, t1, t2, t3, t4, t5, t6;
@@ -122,7 +122,7 @@ window.onload = function init() {
     gradient.addColorStop(0, 'red');
     gradient.addColorStop(0.15, 'orange');
     gradient.addColorStop(0.3, 'yellow');
-    gradient.addColorStop(0.5, 'green');
+    gradient.addColorStop(0.5, '#00FF00');
     gradient.addColorStop(0.7, 'cyan');
     gradient.addColorStop(0.85, 'blue');
     gradient.addColorStop(1, 'magenta');
@@ -178,6 +178,8 @@ window.onload = function init() {
     option.addEventListener("click", function() {
         cindex = option.selectedIndex;
         colorPicker = false;
+
+        drawGradient(colors[cindex][0], colors[cindex][1], colors[cindex][2]);
     });
 
     var c = document.getElementById("clearButton")
