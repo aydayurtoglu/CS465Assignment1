@@ -11,6 +11,7 @@ var delay = 50;
 var cindex = 0;
 var strokeIndex = 0;
 var vertices;
+var deletedVertices= [];
 var colors = [
   vec4(0.0, 0.0, 0.0, 1.0), // black
   vec4(1.0, 0.0, 0.0, 1.0), // red
@@ -23,10 +24,14 @@ var colors = [
 ];
 var t, t1, t2, t3, t4, t5, t6;
 var first = true;
+var numStrokes = 0;
 var numPolygons = 0;
 var numIndices = [];
 numIndices[0] = 0;
 var start = [0];
+var startStrokes = [0];
+var finishStrokes = [0];
+var colorCpy = [];
 
 var undoIndices = [10];
 var undoNo = 0;
@@ -242,6 +247,11 @@ window.onload = function init() {
             t1 = vec4(2*event.clientX/canvas.width-1, 
                 2*(canvas.height-event.clientY)/canvas.height-1, layer, 1.0);        
         }
+        else{
+            numStrokes++;
+            startStrokes[numStrokes] = index;
+
+        }
 
         numPolygons++;
         numIndices[numPolygons] = 0;
@@ -268,6 +278,9 @@ window.onload = function init() {
                 index += 3;
             else
                 index += 6;
+        }
+        else {
+            finishStrokes[numStrokes] = index;
         }
     });
   
@@ -325,8 +338,13 @@ window.onload = function init() {
                 vec4((2*event.clientX/canvas.width-1)-radius*Math.sqrt(3)/2,
                     (2*(canvas.height-event.clientY)/canvas.height-1)+radius/2, layer, 1.0),
                 vec4((2*event.clientX/canvas.width-1)-radius*Math.sqrt(3)/2,
-                     (2*(canvas.height-event.clientY)/canvas.height-1)-radius/2, layer, 1.0),
+                    (2*(canvas.height-event.clientY)/canvas.height-1)-radius/2, layer, 1.0),
             ]
+            //console.log(deletedVertices.length);
+            deletedVertices = deletedVertices.concat(vertices);
+            //console.log(vertices.length);
+            //console.log(deletedVertices.length);
+            colorCpy = colorCpy.concat(color);
 
             gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
             gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(vertices));
@@ -334,6 +352,7 @@ window.onload = function init() {
             gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(color));
 
             index+=16;
+            //strokeIndex+=16;
             numIndices[numPolygons]++;
         }
     });
@@ -503,8 +522,40 @@ window.onload = function init() {
 
     canvas.addEventListener("mousemove", function erase(event) {
         if(mouseClicked && !brush && !isShape){
-            index = index - 16;
-            numIndices[numPolygons]--;
+            var radius = 0.04;
+            layer = layer - 0.00001;
+
+            t = vec2(2*event.clientX/canvas.width-1, 2*(canvas.height-event.clientY)/canvas.height-1);
+
+            for (var i = 0; i < numStrokes; i++){
+                console.log("GIRDIM");
+                for (var j = startStrokes[i]; j < finishStrokes[i]; j+=16){
+                    console.log(deletedVertices[j]);
+                    console.log(finishStrokes[i]);
+                    console.log(j);
+                    //console.log(deletedVertices[j][1]);
+
+                    var distance = Math.sqrt( Math.pow(deletedVertices[j][0]-t[0], 2)+ Math.pow(deletedVertices[j][1]-t[1], 2) );
+                    if (distance < radius){
+                        console.log("GIRDIM3");
+                        deletedVertices.splice(j, 16);
+                        colorCpy.splice(j, 16);
+                        j-=16;
+                        finishStrokes[i]-=16;
+                        index-=16;
+                        numIndices[numPolygons]--;
+                    }
+
+                }
+                
+            }
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+            gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(deletedVertices));
+            gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
+            gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(colorCpy));
+            
+            
         }
     });
 
@@ -616,15 +667,17 @@ function render() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     for (var i = 0; i <= numPolygons; i++) {
+        //gl.drawArrays(gl.TRIANGLES, start[i], numIndices[i]*16);
+        
         if (!isShape)
-            gl.drawArrays(gl.TRIANGLE_STRIP, start[i], numIndices[i]*16);
+            gl.drawArrays(gl.TRIANGLES, start[i], numIndices[i]*16);
         else {
             // shape is rectangle
             if (shapeNo == 0) {
                 if (isFilled)
-                    gl.drawArrays(gl.TRIANGLES, start[i], numIndices[i]*6);
+                    gl.drawArrays(gl.TRIANGLES, start[i], numIndices[i]*16);
                 else if (!isFilled)
-                    gl.drawArrays(gl.LINES, start[i], numIndices[i]*8);
+                    gl.drawArrays(gl.LINES, start[i], numIndices[i]*16);
             }
             // shape is ellipse
             if (shapeNo == 1){
@@ -636,11 +689,12 @@ function render() {
             // shape is triangle
             if (shapeNo == 2){
                 if (isFilled)
-                    gl.drawArrays(gl.TRIANGLES, start[i], numIndices[i]*3);
+                    gl.drawArrays(gl.TRIANGLES, start[i], numIndices[i]*16);
                 else if (!isFilled)
-                    gl.drawArrays(gl.LINES, start[i], numIndices[i]*6);
+                    gl.drawArrays(gl.LINES, start[i], numIndices[i]*16);
             }
         }
+        
     }
     
     requestAnimFrame(render);
