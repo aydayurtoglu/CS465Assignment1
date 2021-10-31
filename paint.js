@@ -291,11 +291,13 @@ window.onload = function init() {
             gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
             gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(value[i]));
 
-            var j = value.length-2-vertexNo;
+            var j = value.length-2-(vertexNo/2);
 
             if (j > 0) {
                 gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
                 gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(value[j]));  
+                console.log(value[j]);
+                console.log("içerideyim");
             }
 
             index += 24;
@@ -430,11 +432,9 @@ window.onload = function init() {
             //console.log(deletedVertices.length);
             colorCpy = colorCpy.concat(color);
 
-           // points.push(index);
             points.push(color);
             points.push(vertices);
             subPoints.push(vertices);
-            
 
             gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
             gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(vertices));
