@@ -59,7 +59,6 @@
       </select>
     </div>
   </div>
-
   <div>
     <div class="buttons">
       <button id="brushButton" class="button"><i class="fa fa-paint-brush fa-2x"></i></button>
@@ -73,10 +72,19 @@
       <input type="text" id="saveName" class="form" placeholder="Enter file name">
       <button id="loadButton" class="button"><i class="fas fa-file-upload fa-2x"></i></button>
       <select id="storage" class="form"></select>
-      <button id="rectangularSelectButton" class="buttonrect">Rectangular Select</button>
     </div>
     <div class="menus">
-      <select class="layers" id="layers" size="4 ">
+      
+      <select class="selectoptions" id="shapes" size="3 ">
+        <option class="rectangle" value="0 ">Rectangle</option>
+        <option class="ellipse" value="1 ">Ellipse</option>
+        <option class="triangle" value="2 ">Triangle</option>
+      </select>
+      <select class="selectoptions" id="filltype" size="2 ">
+        <option class="filled" value="0 ">Filled</option>
+        <option class="unfilled" value="1 ">Unfilled</option>
+      </select>
+      <select class="selectoptions" id="layers" size="4 ">
         <option id="layer1" value="0 ">Layer 1</option>
         <option id="layer2" value="1 ">Layer 2</option>
         <option id="layer3" value="2 ">Layer 3</option>
@@ -84,15 +92,7 @@
       </select>
       <button id="upButton" class="buttonrect">Move selected layer up</button>
       <button id="downButton" class="buttonrect" >Move selected layer down</button>
-      <select class="shapes" id="shapes" size="3 ">
-        <option class="rectangle" value="0 ">Rectangle</option>
-        <option class="ellipse" value="1 ">Ellipse</option>
-        <option class="triangle" value="2 ">Triangle</option>
-      </select>
-      <select class="filltype" id="filltype" size="2 ">
-        <option class="filled" value="0 ">Filled</option>
-        <option class="unfilled" value="1 ">Unfilled</option>
-      </select>
+      <button id="rectangularSelectButton" class="buttonrect">Rectangular Select</button>
     </div>
   </div>
 </body>
