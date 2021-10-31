@@ -282,30 +282,22 @@ window.onload = function init() {
     {
         clearCanvas();
 
-        console.log(value);
-
         var vertexNo = value[value.length-1];
         
-        var count = 0;
-        for(var i = value.length-2; i > value.length-2-vertexNo; i--){
+        for(var i = value.length-2; i > value.length-2-vertexNo; i-=2){
             gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
             gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(value[i]));
 
-            var j = value.length-2-(vertexNo/2);
+            var j = i-1;
 
             if (j > 0) {
                 gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-                gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(value[j]));  
-                console.log(value[j]);
-                console.log("içerideyim");
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(value[j]));
             }
 
             index += 24;
             numIndices[numPolygons]++;
-            count++;
-            j--;
         }
-        console.log("count: " + count)
     }
 
     canvas.addEventListener("mousedown", function draw(event){
@@ -442,7 +434,6 @@ window.onload = function init() {
             gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(color));
 
             index += 24;
-            //strokeIndex+=16;
             numIndices[numPolygons]++;
         }
     });
@@ -480,11 +471,11 @@ window.onload = function init() {
                     gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+3), flatten(t2));
                     gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+4), flatten(t1));
                     gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+5), flatten(t4));
-                    
+
                     gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer);
 
                     for (var i = 0; i < 6; i++)
-                    gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+i), flatten(color));
+                        gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+i), flatten(color));
                 }
                 else {
                     gl.bufferSubData(gl.ARRAY_BUFFER, 16*index, flatten(t1));
@@ -499,7 +490,7 @@ window.onload = function init() {
                     gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer);
 
                     for (var i = 0; i < 8; i++)
-                    gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+i), flatten(color));
+                        gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+i), flatten(color));
                 }
                 numIndices[numPolygons]++;
             } 
