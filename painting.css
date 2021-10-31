@@ -43,11 +43,20 @@ body {
     margin-right: 3px;
     width: 50px;
 }
+
 .buttons {
     display: flex;
     flex-direction: row;
     margin: 5px;
 }
+
 .form {
     width: 120px
+}
+
+.buttonrect{
+    margin-left: 3px;
+    margin-right: 3px;
+    width: 110px; 
+    border-radius: 15px;
 }
