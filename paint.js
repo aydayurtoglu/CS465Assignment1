@@ -6,12 +6,11 @@ var gl;
 
 var maxNumVertices = 200000;
 var index = 0;
-var delay = 50;
 
 var cindex = 0;
 var strokeIndex = 0;
 var vertices;
-var deletedVertices= [];
+var deletedVertices = [];
 var colors = [
   vec4(0.0, 0.0, 0.0, 1.0), // black
   vec4(1.0, 0.0, 0.0, 1.0), // red
@@ -38,7 +37,6 @@ var undoNo = 0;
 
 var mouseClicked = false;
 var capture = false;
-var loadCanvas = false;
 var lineColor;
 var colorPicker = false;
 
@@ -179,7 +177,6 @@ window.onload = function init() {
         colorPicker = true;
     });
 
-    //gl = WebGLUtils.setupWebGL(canvas);
     gl = canvas.getContext("experimental-webgl", {preserveDrawingBuffer: true});
     if (!gl) {
         alert("WebGL isn't available");
@@ -198,6 +195,9 @@ window.onload = function init() {
         clearCanvas();
     });
 
+    /*
+        Clear the whole canvas and the corresponding data
+    */
     function clearCanvas(){
         index = 0;
         numPolygons = 0;
@@ -206,6 +206,7 @@ window.onload = function init() {
         start = [0];
         subPoints = [];
     }
+
     var undo = document.getElementById("undoButton")
     undo.addEventListener("click", function undo(){
         
@@ -239,7 +240,7 @@ window.onload = function init() {
    
     var save = document.getElementById("saveButton")
     save.addEventListener("click", function save(){
-        // capture = true;
+        capture = true;
         fileSize = subPoints.length * 2;
         points.push(fileSize);
 
@@ -256,8 +257,6 @@ window.onload = function init() {
     
     var load = document.getElementById("loadButton")
     load.addEventListener("click", function save(){
-        loadCanvas = true;
-
         if(options.selectedIndex == -1)
         {
             alert("No saved file!");
@@ -278,6 +277,9 @@ window.onload = function init() {
         }    
     });
 
+    /*
+        Load saved points
+    */
     function generatePoints(value)
     {
         clearCanvas();
@@ -346,6 +348,9 @@ window.onload = function init() {
         }
     });
   
+    /*
+        Draw brush strokes
+    */
     canvas.addEventListener("mousemove", function stroke(event) {
         if(mouseClicked && !isShape && brush){
             var color = new Array(24);
@@ -418,10 +423,8 @@ window.onload = function init() {
                 vec4((2*event.clientX/canvas.width-1)-radius*Math.sqrt(3)/2,
                     (2*(canvas.height-event.clientY)/canvas.height-1)-radius/2, layer, 1.0),
             ]
-            //console.log(deletedVertices.length);
+
             deletedVertices = deletedVertices.concat(vertices);
-            //console.log(vertices.length);
-            //console.log(deletedVertices.length);
             colorCpy = colorCpy.concat(color);
 
             points.push(color);
@@ -438,6 +441,9 @@ window.onload = function init() {
         }
     });
 
+    /*
+        Draw shapes
+    */
     canvas.addEventListener("mousemove", function drawShape(event) {
         if(mouseClicked && isShape){
             var color = new Array(6);
@@ -514,7 +520,6 @@ window.onload = function init() {
                         for (var y = t1[1]; y <= t2[1]; y += 0.05) {
                             if ( ((x - centerX) ** 2) + ((y - centerY) ** 2) <= rSquare ) {
                                 t3 = vec4( x, y, layer, 1.0);
-                                //console.log(t3);
                                 gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+count), flatten(t3));
                                 count++;
                             }
@@ -572,7 +577,6 @@ window.onload = function init() {
             layer = layer - 0.00001;
         }
     });
-    
 
     var shapeList = document.getElementById("shapes");
     shapeList.addEventListener("click", function() {
@@ -600,6 +604,9 @@ window.onload = function init() {
         isShape = false;
     });
 
+    /*
+        Erase vertices
+    */
     canvas.addEventListener("mousemove", function erase(event) {
         if(mouseClicked && !brush && !isShape){
             var radius = 0.04;
@@ -692,11 +699,13 @@ window.onload = function init() {
         }
     });
 
+    /*
+        Change the z-coordinates of the points to switch between layers
+    */
     function switchLayers(layer1, layer2) {
         var z1 = (2 ** layer1) / 10.0;
         var z2 = (2 ** layer2) / 10.0;
 
-        console.log(points.length)
         clearCanvas();
         var newPoints = [];
 
@@ -716,9 +725,8 @@ window.onload = function init() {
             z1 -= 0.000001;
         }
 
+        // display new points
         for(var i = newPoints.length-1; i > 0; i-=2){ 
-
-            console.log(newPoints[i][0])
             gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
             gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(newPoints[i]));
 
@@ -730,6 +738,7 @@ window.onload = function init() {
         }
     }
 
+    // show saved file names
     function loadFileNames()
     {
         options.innerHTML = "";
@@ -772,26 +781,6 @@ window.onload = function init() {
     render();
 }
 
-function downloadFile(array, size, fileNamePtr) {
-    var fileName = UTF8ToString(fileNamePtr);
- 
-    var bytes = new Uint8Array(size);
-    for (var i = 0; i < size; i++)
-    {
-       bytes[i] = HEAPU8[array + i];
-    }
- 
-    var blob = new Blob([bytes]);
-    var link = document.createElement('a');
-    link.href = window.URL.createObjectURL(blob);
-    link.download = fileName;
- 
-    var event = document.createEvent("MouseEvents");
-    event.initMouseEvent("click");
-    link.dispatchEvent(event);
-    window.URL.revokeObjectURL(link.href);
-}
-
 function render() {
     if (capture) {
         capture = false;
@@ -803,8 +792,7 @@ function render() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     for (var i = 0; i <= numPolygons; i++) {
-        
-        if (!isShape)
+        if (!isShape) // brush is used
             gl.drawArrays(gl.TRIANGLES, start[i], numIndices[i]*24);
         else {
             // shape is rectangle
@@ -831,6 +819,5 @@ function render() {
         }
         
     }
-    
     requestAnimFrame(render);
 }
