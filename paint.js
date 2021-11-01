@@ -240,7 +240,7 @@ window.onload = function init() {
     var save = document.getElementById("saveButton")
     save.addEventListener("click", function save(){
         // capture = true;
-        fileSize = subPoints.length;
+        fileSize = subPoints.length * 2;
         points.push(fileSize);
 
         if(!document.getElementById("saveName").value)
@@ -278,6 +278,28 @@ window.onload = function init() {
         }    
     });
 
+    function generatePoints(value)
+    {
+        clearCanvas();
+
+        var vertexNo = value[value.length-1];
+        
+        for(var i = value.length-2; i > value.length-2-vertexNo; i-=2){
+            gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+            gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(value[i]));
+
+            var j = i-1;
+
+            if (j > 0) {
+                gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
+                gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(value[j]));
+            }
+
+            index += 24;
+            numIndices[numPolygons]++;
+        }
+    }
+
     canvas.addEventListener("mousedown", function draw(event){
         mouseClicked = true;
         undoNo = 0;
@@ -291,7 +313,6 @@ window.onload = function init() {
         else{
             numStrokes++;
             startStrokes[numStrokes] = index;
-
         }
 
         numPolygons++;
@@ -403,10 +424,9 @@ window.onload = function init() {
             //console.log(deletedVertices.length);
             colorCpy = colorCpy.concat(color);
 
-           // points.push(index);
+            points.push(color);
             points.push(vertices);
             subPoints.push(vertices);
-           // points.push(color);
 
             gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
             gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(vertices));
@@ -414,7 +434,6 @@ window.onload = function init() {
             gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(color));
 
             index += 24;
-            //strokeIndex+=16;
             numIndices[numPolygons]++;
         }
     });
@@ -452,11 +471,11 @@ window.onload = function init() {
                     gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+3), flatten(t2));
                     gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+4), flatten(t1));
                     gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+5), flatten(t4));
-                    
+
                     gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer);
 
                     for (var i = 0; i < 6; i++)
-                    gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+i), flatten(color));
+                        gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+i), flatten(color));
                 }
                 else {
                     gl.bufferSubData(gl.ARRAY_BUFFER, 16*index, flatten(t1));
@@ -471,7 +490,7 @@ window.onload = function init() {
                     gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer);
 
                     for (var i = 0; i < 8; i++)
-                    gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+i), flatten(color));
+                        gl.bufferSubData(gl.ARRAY_BUFFER, 16*(index+i), flatten(color));
                 }
                 numIndices[numPolygons]++;
             } 
@@ -589,16 +608,9 @@ window.onload = function init() {
             t = vec2(2*event.clientX/canvas.width-1, 2*(canvas.height-event.clientY)/canvas.height-1);
 
             for (var i = 0; i < numStrokes; i++){
-                //console.log("GIRDIM");
                 for (var j = startStrokes[i]; j < finishStrokes[i]; j+=24){
-                    //console.log(deletedVertices[j]);
-                    //console.log(finishStrokes[i]);
-                   // console.log(j);
-                    //console.log(deletedVertices[j][1]);
-
                     var distance = Math.sqrt( Math.pow(deletedVertices[j][0]-t[0], 2)+ Math.pow(deletedVertices[j][1]-t[1], 2));
                     if (distance < radius){
-                        //console.log("GIRDIM3");
                         deletedVertices.splice(j, 24);
                         colorCpy.splice(j, 24);
                         j-=24;
@@ -634,16 +646,19 @@ window.onload = function init() {
                     temp = document.getElementById("layer1").innerHTML;
                     document.getElementById("layer1").innerHTML = document.getElementById("layer2").innerHTML;
                     document.getElementById("layer2").innerHTML = temp;
+                    switchLayers(0,1);
                     break;
                 case 2:
                     temp = document.getElementById("layer3").innerHTML;
                     document.getElementById("layer3").innerHTML = document.getElementById("layer2").innerHTML;
                     document.getElementById("layer2").innerHTML = temp;
+                    switchLayers(1,2);
                     break;
                 case 3:
                     temp = document.getElementById("layer4").innerHTML;
                     document.getElementById("layer4").innerHTML = document.getElementById("layer3").innerHTML;
                     document.getElementById("layer3").innerHTML = temp;
+                    switchLayers(2,3);
                     break;
             }
         }
@@ -659,20 +674,61 @@ window.onload = function init() {
                     temp = document.getElementById("layer1").innerHTML;
                     document.getElementById("layer1").innerHTML = document.getElementById("layer2").innerHTML ;
                     document.getElementById("layer2").innerHTML = temp;
+                    switchLayers(0,1);
                     break;
                 case 1:
                     temp = document.getElementById("layer3").innerHTML;
                     document.getElementById("layer3").innerHTML = document.getElementById("layer2").innerHTML;
                     document.getElementById("layer2").innerHTML = temp;
+                    switchLayers(1,2);
                     break;
                 case 2:
                     temp = document.getElementById("layer4").innerHTML;
                     document.getElementById("layer4").innerHTML = document.getElementById("layer3").innerHTML;
                     document.getElementById("layer3").innerHTML = temp;
+                    switchLayers(2,3);
                     break;
             }
         }
     });
+
+    function switchLayers(layer1, layer2) {
+        var z1 = (2 ** layer1) / 10.0;
+        var z2 = (2 ** layer2) / 10.0;
+
+        console.log(points.length)
+        clearCanvas();
+        var newPoints = [];
+
+        for(var i = points.length-1; i > 0; i-=2){
+            if ( points[i][0][2] <= z1 && points[i][0][2] > z1-0.01){
+                for (var k = 0; k < 24; k++)
+                    points[i][k][2] = z2; // change the z coordinate of the vertex
+            }
+            else if ( points[i][0][2] <= z2 && points[i][0][2] > z2-0.01){
+                for (var k = 0; k < 24; k++)
+                    points[i][k][2] = z1; // change the z coordinate of the vertex
+            }
+            newPoints.push(points[i-1]); // push the color
+            newPoints.push(points[i]); // push the new vertex
+
+            z2 -= 0.000001;
+            z1 -= 0.000001;
+        }
+
+        for(var i = newPoints.length-1; i > 0; i-=2){ 
+
+            console.log(newPoints[i][0])
+            gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+            gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(newPoints[i]));
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
+            gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(newPoints[i-1]));
+            
+            index += 24;
+            numIndices[numPolygons]++;
+        }
+    }
 
     function loadFileNames()
     {
@@ -684,29 +740,6 @@ window.onload = function init() {
             option.innerHTML = Object.keys(localStorage)[i];
             options.appendChild(option);
         }
-    }
-
-    function generatePoints(value)
-    {
-        clearCanvas();
-
-        console.log(value);
-
-        var vertexNo = value[value.length-1];
-        
-        var count = 0;
-        for(var i = value.length-2; i > value.length-2-vertexNo; i--){
-            gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-            gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(value[i]));
-
-            gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-            gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(colors[0]));  
-
-            index += 24;
-            numIndices[numPolygons]++;
-            count++;
-        }
-        console.log(count)
     }
 
     gl.enable(gl.DEPTH_TEST);
